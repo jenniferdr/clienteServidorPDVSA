@@ -16,6 +16,14 @@
 
 int main(int agrc, char *argv[]){
 
+  /* Obtener args de la línea de comandos*/
+  char* nombre;  // Nombre de esta Bomba
+  int capMax;    // Capacidad Máxima (Litros)
+  int inven;     // Inventario actual
+  int consumo;   // Consumo promedio (Litros*Minutos)
+ 
+  argumentos_cliente(argc,argv,nombre,&inven,&consumo,&capMax);
+
   int sock;
   struct sockaddr_in serv_addr;
 

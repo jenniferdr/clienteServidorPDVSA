@@ -22,13 +22,13 @@ int main(int agrc, char *argv[]){
 
   /* Obtener args de la línea de comandos*/
   char* nombre;   // Nombre de este Centro
-  int max;        // Capacidad Máxima (Litros)
+  int capMax;     // Capacidad Máxima (Litros)
   int inven;      // Inventario actual
   int tiempo;     // Tiempo de respuesta (minutos)
   int sumi;       // Suministro promedio (Litros*Minutos)
   int puerto;     // Puerto en el que escucha 
  
-  argumentos_servidor(argc,argv,nombre,&inven, &tiempo,&sumi,&puerto,&max);
+  argumentos_servidor(argc,argv,nombre,&inven, &tiempo,&sumi,&puerto,&capMax);
 
   int sock;
   struct sockaddr_in serv_addr;

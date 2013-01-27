@@ -1,8 +1,10 @@
+/* ***
+ * Implementación de funciones auxiliares.
+ */
+
 #include "funciones.h"
 
 void opciones(){
-
-
   printf("Sintaxis Correcta para el Servidor \n");
   printf("-n <Nombre De la bomba> \n");
   printf("-i <Numero del Inventario> \n");
@@ -11,50 +13,55 @@ void opciones(){
   printf("-cp <Numero Capacida Maxima> \n");
 }
 
-void argumentos_cliente (int num,char ** arreglo, char* nombr, int *inve, int *consu, int *camax){
+void argumentos_cliente (int num,char ** arreglo, char* nombr, int *inve
+			 ,int *consu, int *capmax){
   int op;
-  *camax = 10;
+  *capmax = 10;
+
   if (num !=7){
     perror( "Sintaxis Incorrecta");
     opciones();
    
-  }
-  else {
-    
-      opterr=0;
-      // Obtener argumentos y validarlos  
-      while((op=getopt(num,arreglo,"n:i:c:"))!=-1)
-	switch(op){
-	case'n':
-	  nombr = optarg;
-	  printf("El nombre de la bomba es: %s \n", nombr);
-	  break;
-	case'i':
-	  *inve = atoi(optarg);
+  }else{
+    /* Usamos la libreria Getopt para analizar argumentos */ 
+    /* http://www.gnu.org/software/libc/manual/html_node/Getopt.html#Getopt */
+
+    opterr=0;
+
+    // Obtener argumentos y validarlos  
+    while((op=getopt(num,arreglo,"n:i:c:")) != -1)
+      switch(op){
+
+      case'n':
+	nombr = optarg;
+	printf("El nombre de la bomba es: %s \n", nombr);
+	break;
+
+      case'i':
+	*inve = atoi(optarg);
 	  
-	  if (0 < *inve && *inve < *camax){
-	    printf(" inventario es %d \n", *inve);
-	  }
-	  else {
-	    perror("ERROR: El numero del Inventario no corresponde\n  Debe estar en [0 - capacidadMaxima]");
-	  }
-	  break;
-	case'c':
-	  
-	  *consu = atoi(optarg);
-	  if (0 <  *consu && *consu < 1000){
-	    printf("consumo es: %d \n",*consu );
-	  }
-	  else 
-	    perror("ERROR: El numero del consumo  \n Debe estar en [0-1000]");
-	  break;
-   
-	case '?':
-	  perror("ERROR :opcion desconocida\n");
-	  opciones();
-	  break;
-	  
+	if (0 < *inve && *inve < *camax){
+	  printf(" inventario es %d \n", *inve);
+	}else{
+	  perror("ERROR: El numero del Inventario no corresponde\n" 
+		 +"Debe estar en [0 - capacidadMaxima]");
 	}
+	break;
+
+      case'c':	  
+	*consu = atoi(optarg);
+	if (0 <  *consu && *consu < 1000){
+	  printf("consumo es: %d \n",*consu );
+	}else{ 
+	  perror("ERROR: El numero del consumo  \n Debe estar en [0-1000]");
+	}
+	break;
+   
+      case '?':
+	perror("ERROR :opcion desconocida\n");
+	opciones();
+	break;
+      }
       
   }
 }
