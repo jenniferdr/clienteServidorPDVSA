@@ -11,7 +11,7 @@
 
 // Obtener argumentos..
 extern void argumentos_cliente (int num, char ** arreglo, char *nombr
-				,int* inve, int *consu, int* camax);
+				,int* inve, int *consu, int* camax,  char* archi);
 
 
 extern void argumentos_servidor (int num,char ** arreglo, char* nombr,int *inve,

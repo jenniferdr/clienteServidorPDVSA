@@ -18,7 +18,7 @@
 #define SERVER_PORT 10323
 #define BACK 5
 
-int main(int agrc, char *argv[]){
+int main(int argc, char *argv[]){
 
   /* Obtener args de la línea de comandos*/
   char* nombre;   // Nombre de este Centro
