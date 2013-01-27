@@ -3,7 +3,7 @@
 void opciones(){
 
 
-  printf("Sintaxis Correcta para el Servidor \n");
+  printf("Sintaxis Correcta para el Cliente \n");
   printf("-n <Nombre De la bomba> \n");
   printf("-i <Numero del Inventario> \n");
   printf("-fc <Nombre del Archivo Central > \n");
@@ -11,53 +11,75 @@ void opciones(){
   printf("-cp <Numero Capacida Maxima> \n");
 }
 
-void argumentos_cliente (int num,char ** arreglo, char* nombr, int *inve, int *consu, int *camax){
+void argumentos_cliente (int num,char ** arreglo, char* nombr, int *inve, int *consu, int *camax, char* archi){
   int op;
-  *camax = 10;
-  if (num !=7){
+  if (num !=11){
     perror( "Sintaxis Incorrecta");
     opciones();
    
   }
   else {
-    
-      opterr=0;
-      // Obtener argumentos y validarlos  
-      while((op=getopt(num,arreglo,"n:i:c:"))!=-1)
-	switch(op){
-	case'n':
-	  nombr = optarg;
-	  printf("El nombre de la bomba es: %s \n", nombr);
-	  break;
-	case'i':
-	  *inve = atoi(optarg);
-	  
-	  if (0 < *inve && *inve < *camax){
-	    printf(" inventario es %d \n", *inve);
-	  }
-	  else {
-	    perror("ERROR: El numero del Inventario no corresponde\n  Debe estar en [0 - capacidadMaxima]");
-	  }
-	  break;
-	case'c':
-	  
-	  *consu = atoi(optarg);
-	  if (0 <  *consu && *consu < 1000){
-	    printf("consumo es: %d \n",*consu );
-	  }
-	  else 
-	    perror("ERROR: El numero del consumo  \n Debe estar en [0-1000]");
-	  break;
-   
-	case '?':
-	  perror("ERROR :opcion desconocida\n");
-	  opciones();
-	  break;
-	  
+    int i;
+     printf("\n");      
+    for(i = 0 ; i < 5 ; i++){
+     
+      if(!strcmp(arreglo[i*2 + 1],"-cp")) { 
+	*camax = atoi(arreglo[i*2+2]); 
+	
+	if (38000 < *camax && *camax < 380000){
+	  printf("La Capacidad maxima es: %d \n", *camax);
+	 
 	}
-      
+	
+	else { 
+	  perror("El Numero de Capacidad Maxima \n Debe estar en [38000 - 3800000]");
+	  break;
+	}
+	continue;
+      }
+    }
+   
+     for(i = 0 ; i < 5 ; i++){
+     
+       if(!strcmp(arreglo[i*2 + 1],"-c")) { 
+	*consu= atoi(arreglo[i*2+2]);
+	if (0 < *consu && *consu < 1000){
+	  printf("El consumo es %d \n", *consu);
+	}
+	else { 
+	  perror("El numero del consumo debe estar en [0 - 1000]");
+	  break;
+	}
+	continue;
+      }
+      else if(!strcmp(arreglo[i*2 + 1],"-n")) { 
+	nombr= arreglo[i*2+2];
+	printf("El nombre de la bomba es %s \n", nombr);
+	continue;
+      }
+      else if(!strcmp(arreglo[i*2 + 1],"-i")) { 
+	*inve= atoi(arreglo[i*2+2]);
+	if (0 < *inve && *inve < *camax){
+	  printf(" inventario es %d \n", *inve);
+	}
+	else {
+	  perror("ERROR: El numero del Inventario no corresponde\n  Debe estar en [0 - capacidadMaxima]");
+	}
+	continue;
+      }
+      else if(!strcmp(arreglo[i*2 + 1],"-fc")) { 
+	archi= arreglo[i*2+2];
+	printf("El archivo Central es %s\n", archi);
+	continue;
+      }	    
+     
+      else {
+	break;
+      }
+    } 
   }
 }
+
 
 
 void argumentos_servidor (int num,char ** arreglo, char* nombr, int *inve, int *tiem, int *sum,int *puert, int *camax){
@@ -104,7 +126,7 @@ void argumentos_servidor (int num,char ** arreglo, char* nombr, int *inve, int *
 	    break;
 	  case'i':
 	    *inve = atoi(optarg);
-	      
+	   
 	    if (0 < *inve && *inve < *camax){
 	      printf(" inventario es %d \n", *inve);
 	    }

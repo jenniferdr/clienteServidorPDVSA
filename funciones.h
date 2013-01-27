@@ -5,9 +5,7 @@
 
 
 
-extern void argumentos_cliente (int num, char ** arreglo, char *nombr, int* inve, int *consu, int* camax);
-
-
+extern void argumentos_cliente (int num, char ** arreglo, char *nombr, int* inve, int *consu, int* camax, char* archi);
 extern  void opciones();
 
 extern void argumentos_servidor (int num,char ** arreglo, char* nombr, int *inve, int *tiem, int *sum,int *puert, int *camax);

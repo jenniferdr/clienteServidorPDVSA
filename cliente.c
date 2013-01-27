@@ -7,7 +7,8 @@ int main(int argc, char **argv){
   int inven  ;
   int consumo;
   int max ;
-  argumentos_cliente(argc,argv,nombre,&inven,&consumo,&max);
+  char* archivo;
+  argumentos_cliente(argc,argv,nombre,&inven,&consumo,&max,archivo);
  
 }
  
