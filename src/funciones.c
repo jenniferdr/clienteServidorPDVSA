@@ -5,7 +5,6 @@
 #include "funciones.h"
 
 void opciones(){
-
   printf("Sintaxis Correcta para el Cliente \n");
   printf("-n <Nombre De la bomba> \n");
   printf("-i <Numero del Inventario> \n");
@@ -173,3 +172,44 @@ void argumentos_servidor (int num,char ** arreglo, char* nombr, int *inve, int *
     }
 
 }
+int obtener_lista_dns(char* filename[],char ** nombre, 
+		      char **direcciones, int *puertos ){
+   
+  // static const char filename[] = "hola";
+  FILE *file = fopen ( filename, "r" );
+  char* t;
+  int i=0;
+
+  if ( file != NULL ){
+    char linea [ 128 ]; 
+    while ( fgets ( linea, sizeof linea, file ) != NULL ){
+      t =strtok(linea," &");
+      
+      int j=0;
+      while(j < 3){
+	//  printf("* %s%d%d *\n",t,j,i);
+	if (j==0)
+	  nombres[i]=t;
+	if(j==1)
+	  dir[i]=t;
+	if (j==2)
+	  puerto[i]=atoi(t);
+	j=j+1;
+	
+
+
+	t = strtok (NULL, " &");
+      }
+      //   printf("%s & %s & %d \n",nombres[i],dir[i],puerto[i]);
+      
+      i=i+1;
+      //fputs ( linea, stdout ); 
+    }
+    fclose ( file );
+ 
+  }else{
+    perror ( filename ); 
+  }
+  return 0;
+}
+

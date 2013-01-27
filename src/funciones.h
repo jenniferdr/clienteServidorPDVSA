@@ -19,3 +19,6 @@ extern void argumentos_servidor (int num,char ** arreglo, char* nombr,int *inve,
 
 // Imprimir por pantalla el uso correcto del comando
 extern void opciones();
+
+
+extern obtener_lista_dns(char ** nombre, char **direcciones, int *puertos );
