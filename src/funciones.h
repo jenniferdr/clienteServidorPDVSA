@@ -21,4 +21,4 @@ extern void argumentos_servidor (int num,char ** arreglo, char* nombr,int *inve,
 extern void opciones();
 
 
-extern obtener_lista_dns(char ** nombre, char **direcciones, int *puertos );
+extern obtener_lista_dns(char filename[], char ** nombre, char **direcciones, int *puertos );

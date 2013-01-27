@@ -172,7 +172,7 @@ void argumentos_servidor (int num,char ** arreglo, char* nombr, int *inve, int *
     }
 
 }
-int obtener_lista_dns(char* filename[],char ** nombre, 
+int obtener_lista_dns(char filename[],char ** nombre, 
 		      char **direcciones, int *puertos ){
    
   // static const char filename[] = "hola";
@@ -183,22 +183,22 @@ int obtener_lista_dns(char* filename[],char ** nombre,
   if ( file != NULL ){
     char linea [ 128 ]; 
     while ( fgets ( linea, sizeof linea, file ) != NULL ){
-      t =strtok(linea," &");
+      *t = strtok(linea," &");
       
       int j=0;
       while(j < 3){
 	//  printf("* %s%d%d *\n",t,j,i);
 	if (j==0)
-	  nombres[i]=t;
+	  nombre[i]=t;
 	if(j==1)
-	  dir[i]=t;
+	  direcciones[i]=t;
 	if (j==2)
-	  puerto[i]=atoi(t);
+	  puertos[i]=atoi(t);
 	j=j+1;
 	
 
 
-	t = strtok (NULL, " &");
+	*t = strtok (NULL, " &");
       }
       //   printf("%s & %s & %d \n",nombres[i],dir[i],puerto[i]);
       
