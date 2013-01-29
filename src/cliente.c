@@ -48,10 +48,10 @@ int main(int argc, char *argv[]){
   serv_addr.sin_addr = *((struct in_addr *)he->h_addr);  
   bzero(&(serv_addr.sin_zero),8);
 
-   if(connect(sock,(struct sockaddr*)&serv_addr,sizeof(struct sockaddr_in))==-1){ 
-      perror("connect() error\n");
-      exit(-1);
-   }
+  if(connect(sock,(struct sockaddr*)&serv_addr,sizeof(struct sockaddr_in))==-1){ 
+    perror("connect() error\n");
+    exit(-1);
+  }
    
    
 
