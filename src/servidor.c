@@ -8,11 +8,6 @@
  *          Jennifer Dos Reis
  */
 
-#include <sys/types.h> 
-#include <sys/socket.h>
-#include <stdlib.h>
-#include <netdb.h>
-#include <strings.h>
 #include "funciones.h"
 
 #define SERVER_PORT 10323
