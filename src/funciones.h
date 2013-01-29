@@ -6,6 +6,11 @@
 #include <unistd.h>
 #include <errno.h>
 #include <stdbool.h>
+#include <sys/types.h> 
+#include <sys/socket.h>
+#include <stdlib.h>
+#include <netdb.h>
+#include <strings.h>
 
 /*Comentar lo que hace cada funcion*/
 
@@ -21,4 +26,4 @@ extern void argumentos_servidor (int num,char ** arreglo, char* nombr,int *inve,
 extern void opciones();
 
 
-extern obtener_lista_dns(char filename[], char ** nombre, char **direcciones, int *puertos );
+extern obtener_lista_dns(char *filename1, char ** nombre, char **direcciones, int *puertos );
