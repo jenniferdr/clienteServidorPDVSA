@@ -66,9 +66,9 @@ int main(int argc, char *argv[]){
     if((sock2=accept(sock,(struct sockaddr*)&client_addr,&sizeSockadd)) == -1){
       perror("Error al aceptar conexion con el cliente");
       continue;
-    }
-    
-    
+    } 
+
+    while(true);
     
   }
 
