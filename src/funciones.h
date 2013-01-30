@@ -11,6 +11,8 @@
 #include <stdlib.h>
 #include <netdb.h>
 #include <strings.h>
+#define BACK 5
+#define MAX_LONG_LOG 100
 
 /*Comentar lo que hace cada funcion*/
 
