@@ -172,14 +172,14 @@ void argumentos_servidor (int num,char ** arreglo, char* nombr, int *inve, int *
     }
 
 }
-int obtener_lista_dns(char *filename1,char ** nombre, 
+int obtener_lista_dns(char filename[],char ** nombre, 
 		      char **direcciones, int *puertos ){
    
-  static const char filename[]="hola";
+  // static const char filename[]="hola";
   FILE *file = fopen ( filename, "r" );
   char* t;
   int i=0;
- 
+  printf("filename%s",filename);
   if ( file != NULL ){
     
     char linea [ 128 ]; 
