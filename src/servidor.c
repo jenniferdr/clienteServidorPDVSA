@@ -62,9 +62,17 @@ int main(int argc, char *argv[]){
       perror("Error al aceptar conexion con el cliente");
       continue;
     } 
-
-    while(true);
     
+    // Recibir solicitud
+    char buff[9];
+    int len;
+    int recibidos= recv(sock2,buff,9,0);
+
+    if(strcmp(buff,"Tiempo")==0){
+      printf("Hey pidieron: %s",buff);
+    }else{
+      printf("Pfff ..");
+    }
   }
 
   return 0;
