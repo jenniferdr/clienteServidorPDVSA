@@ -12,7 +12,7 @@
 
 int main(int argc, char *argv[]){
 
-  char* nombre;   // Nombre de este Centro
+  char nombre[MAX_LONG_LOG-8];   // Nombre de este Centro
   int capMax;     // Capacidad Máxima (Litros)
   int inven;      // Inventario actual
   int tiempo;     // Tiempo de respuesta (minutos)
