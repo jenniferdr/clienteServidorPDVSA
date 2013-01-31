@@ -1,14 +1,20 @@
 /* Servidor PDVSA  
  * Simulación de un centro de distribución gasolina que 
  * se encarga de atender peticiones de las bombas de gasolina 
- * en las cuales se hace un pedido de una gandola 
- * y asi surtir de gasolina a los clientes.
+ * las cuales hacen un pedido de una gandola de 38.000
+ * litros de gasolina.
  *
  * Autores: Juliana Leon 
  *          Jennifer Dos Reis
  */
 
 #include "funciones.h"
+
+void *llevar_tiempo(int *tiempo){
+  while(1){
+    printf("Llevo el tiempo");
+  }
+}
 
 int main(int argc, char *argv[]){
 
@@ -18,6 +24,7 @@ int main(int argc, char *argv[]){
   int tiempo;     // Tiempo de respuesta (minutos)
   int sumi;       // Suministro promedio (Litros*Minutos)
   int puerto;     
+  int tiempo_actual;
  
   obtener_argumentos_servidor(argc,argv,nombre,&inven, &tiempo,&sumi,&puerto,&capMax);
 
@@ -34,9 +41,13 @@ int main(int argc, char *argv[]){
   sprintf(nombre_log,"log_%s.txt",nombre);
   FILE *log = fopen(nombre_log,"w");
 
-  
+  fprintf(log,"Estado inicial: %d \n",inven);
+  if(inven==0) fprintf(log,"Tanque vacio: 0 minutos \n");
+  if(inven==capMax) fprintf(log,"Tanque full: 0 minutos \n");
+  fflush(log);
 
-  //Iniciar tiempo
+  pthread_t contador_tiempo;
+  pthread_create(&contador_tiempo,NULL,llevar_tiempo,& tiempo_actual);
 
   while(1){
     printf("Esperare que un cliente llegue \n");
@@ -63,6 +74,7 @@ int main(int argc, char *argv[]){
     }
   }
 
+  // Recordar cerrar el archivo al terminar
   return 0;
 
 
