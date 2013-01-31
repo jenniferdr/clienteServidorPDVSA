@@ -17,7 +17,7 @@ int main(int argc, char *argv[]){
   int capMax;    // Capacidad Máxima (Litros)
   int inven;     // Inventario actual
   int consumo;   // Consumo promedio (Litros*Minutos)
-  char archivo[128];
+  char * archivo;
   char* nombres[128];
   char* direcciones[128];
   int puertos[1000];
@@ -43,8 +43,19 @@ int main(int argc, char *argv[]){
   argumentos_cliente(argc,argv,nombre,&inven,&consumo,&capMax, archivo);
 
     
-   obtener_lista_dns(archivo, nombres,direcciones,puertos);
- 
+  //obtener_lista_dns(archivo, nombres,direcciones,puertos);
+  /* CABLE PARA LEER EL ARCHIVO*/
+  nombres[0]= "El_Picoteo";
+  nombres[1]= "La_Pala";
+  nombres[2]= "hola";
+  nombres[3] = NULL;
+  direcciones[0]="localhost";
+  direcciones[1]="lala.ldc.usb.ve";
+  direcciones[2]="piscis.ac.labf.usb.ve";
+  puertos[0]=1068;
+  puertos[1]=1068;
+  puertos[2]=1068;
+
   // CONNECT CON SERVIDOR PARA PEDIR TIEMPOS
   // PEDIR LOS TIEMPOS!!!!
 
@@ -71,7 +82,7 @@ int main(int argc, char *argv[]){
     /*Recopilar los datos del servidor en serv_addr*/
     serv_addr.sin_family = AF_INET;
     // FIX
-    serv_addr.sin_port = htons(puertos[k]); 
+    serv_addr.sin_port = htons(10323); 
     serv_addr.sin_addr = *((struct in_addr *)he->h_addr);  
     bzero(&(serv_addr.sin_zero),8);
    
@@ -113,15 +124,15 @@ int main(int argc, char *argv[]){
   }
   // printf("posision 0 %d %s %s %d",tiempos[0], nombres[0], direcciones[0],puertos[0]);
   k = 0;
-  int tiempo;
-  while (tiempo <= 480){
-    if ((capMax-inven)>=38000){
+  while (1){
+    if ((capMax-inven)>38000){
       // Pedir Gasolina
       int sock;
       struct sockaddr_in serv_addr;
       /*Crear el socket */
       if((sock= socket(AF_INET,SOCK_STREAM,0))==-1)
 	exit(0);
+ 
  
       struct hostent *he;
       /*Colocar aqui el nombre extraido del archivo!!!*/
@@ -134,7 +145,7 @@ int main(int argc, char *argv[]){
       /*Recopilar los datos del servidor en serv_addr*/
       serv_addr.sin_family = AF_INET;
       // FIX
-      serv_addr.sin_port = htons(puertos[k]); 
+      serv_addr.sin_port = htons(10323); 
       serv_addr.sin_addr = *((struct in_addr *)he->h_addr);  
       bzero(&(serv_addr.sin_zero),8);
      
@@ -148,14 +159,13 @@ int main(int argc, char *argv[]){
       read(sock,&gasolina,sizeof(int));
       // poner un numero para no te puedo atender
       if (gasolina == 10){
-	// no me puede atender
-	k=k+1;
+	// no me puede atender 
 	continue; 
 
       } else {
 	// si me puede atender
 	// ver si el tiempo de dormir es de verdad ese
-	sleep(tiempos[k]); 
+	sleep(tiempos[0]); 
 	// escribir en logs me atendio 
     
       }
@@ -163,15 +173,15 @@ int main(int argc, char *argv[]){
       return 0;
      
     } else {
-      usleep(100000);
-      inven= inven - consumo;
-      tiempo = tiempo + 1;
+     
       // aun no necesita gasolina esperar 
       // debe esperar no se cuanto 
       // RESTAS A INVENTARIO
-    } 
+    }
 
-  }
+    k = k + 1;  
+
+  } 
  
   return 0;
 }

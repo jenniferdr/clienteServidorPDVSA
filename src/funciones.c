@@ -14,6 +14,17 @@ void opciones(){
   printf("-cp <Numero Capacida Maxima> \n");
 }
 
+void opciones_servidor(){
+  printf("Sintaxis Correcta para el Servidor \n");
+  printf("-n <Nombre Del Centro> \n");
+  printf("-i <Numero del Inventario> \n");
+  printf("-s <Cantidad De Suministro > \n");
+  printf("-t <Tiempo> \n");
+  printf("-cp <Numero Capacida Maxima> \n");
+}
+
+
+
 /*
  * Crea un socket TCP, configura el bind() y listen()
  * Toma como argumento el puerto en el que se desea asociar el socket y
@@ -107,7 +118,7 @@ void argumentos_cliente (int num,char ** arreglo, char* nombr, int *inve, int *c
 	continue;
       }
       else if(!strcmp(arreglo[i*2 + 1],"-fc")) { 
-	archi= arreglo[i*2+2];
+	strcpy(archi,arreglo[i*2+2]);
 	printf("El archivo Central es %s\n", archi);
 	continue;
       }	    
@@ -127,7 +138,7 @@ void obtener_argumentos_servidor (int num,char ** arreglo, char* nombr, int *inv
   bool cp = false;
   if (num !=13){
     perror( "Sintaxis Incorrecta");
-    opciones();
+    opciones_servidor();
     
   }
   else 
@@ -135,7 +146,7 @@ void obtener_argumentos_servidor (int num,char ** arreglo, char* nombr, int *inv
       int i; 
       for(i = 0 ; i < 6 ; i++) 
 	if(!strcmp(arreglo[i*2 + 1],"-cp")) { 
-	       
+	  
 	  *camax = atoi(arreglo[i*2+2]); 
 	    
 	  if (38000 < *camax && *camax < 380000){
@@ -150,8 +161,8 @@ void obtener_argumentos_servidor (int num,char ** arreglo, char* nombr, int *inv
 	
 	
       if(!cp){ 
-	opciones(); 
-	perror("ERROR : No coloco la opcion -cp  O ");
+	opciones_servidor(); 
+	perror("ERROR : No coloco la opcion -cp  ");
 	perror("El Numero de Capacidad Maxima \n Debe estar en [38000 - 3800000]");
       } 
       else { 
@@ -200,7 +211,7 @@ void obtener_argumentos_servidor (int num,char ** arreglo, char* nombr, int *inv
 	    break;
 	  case '?':
 	    perror("Error: Opcion Desconocida\n");
-	    opciones();
+	    opciones_servidor();
 	      
 	    break;
 	      
@@ -212,33 +223,33 @@ void obtener_argumentos_servidor (int num,char ** arreglo, char* nombr, int *inv
 int obtener_lista_dns(char filename[],char ** nombre, 
 		      char **direcciones, int *puertos ){
    
-  // static const char filename[]="hola";
   FILE *file = fopen ( filename, "r" ); // Validar esta llamada
-  char* t;
-  int i=0;
+  char t[128];
+  int i = 0;
   printf("filename%s",filename);
   if ( file != NULL ){
     
     char linea [ 128 ]; 
     while ( fgets ( linea, sizeof linea, file ) != NULL ){
-      *t = strtok(linea," &");
-      printf("token %s",t);
+      strcpy(t,strtok(linea," &"));
+      //    printf("token %s",t);
       int j=0;
       while(j < 3){
-	printf("* %s%d%d *\n",t,j,i);
+	//	printf("* %s%d%d *\n",t,j,i);
 	if (j==0)
-	  nombre[i]=t;
+	  strcpy(nombre[i],t);
 	if(j==1)
-	  direcciones[i]=t;
-	if (j==2)
+	  strcpy(direcciones[i],t);
+	if (j==2){
+	  printf("TE es:%s",t);
 	  puertos[i]=atoi(t);
+	}
 	j=j+1;
-	
 
-
-	*t = strtok (NULL, " &");
+	strcpy(t,strtok (NULL, " &"));
       }
-      printf("%s & %s & %d \n",nombre[i],direcciones[i],puertos[i]);
+   
+      // printf("%s & %s & %d \n",nombre[i],direcciones[i],puertos[i]);
       
       i=i+1;
       //fputs ( linea, stdout ); 
