@@ -48,7 +48,7 @@ int main(int argc, char *argv[]){
 
     
   //obtener_lista_dns(archivo, nombres,direcciones,puertos);
- /* CABLE PARA LEER EL ARCHIVO*/
+  /* CABLE PARA LEER EL ARCHIVO*/
   nombres[0]= "El_Picoteo";
   nombres[1]= "La_Pala";
   nombres[2]= "hola";
@@ -63,20 +63,20 @@ int main(int argc, char *argv[]){
   tiempos[1] = 4;
   tiempos[2] = 10;
 
- // CONNECT CON SERVIDOR PARA PEDIR TIEMPOS
- // PEDIR LOS TIEMPOS!!!!
+  // CONNECT CON SERVIDOR PARA PEDIR TIEMPOS
+  // PEDIR LOS TIEMPOS!!!!
 
-int sock;
- struct sockaddr_in serv_addr;
- // printf("\n nombre%s",nombres[1]);
- /*Crear el socket */
- if((sock= socket(AF_INET,SOCK_STREAM,0))==-1)
+  int sock;
+  struct sockaddr_in serv_addr;
+  // printf("\n nombre%s",nombres[1]);
+  /*Crear el socket */
+  if((sock= socket(AF_INET,SOCK_STREAM,0))==-1)
     exit(0);
  
  
- struct hostent *he;
+  struct hostent *he;
 
- // aqui deberiamos iterar sobre los servidores para pedir el tiempo
+  // aqui deberiamos iterar sobre los servidores para pedir el tiempo
 
   /*Colocar aqui el nombre extraido del archivo!!!*/
   if( (he=gethostbyname(direcciones[0])) == NULL){
