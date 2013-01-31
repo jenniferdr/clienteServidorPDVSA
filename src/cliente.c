@@ -13,7 +13,7 @@
 int main(int argc, char *argv[]){
 
   /* Obtener args de la línea de comandos*/
-  char* nombre;  // Nombre de esta Bomba
+  char nombre[MAX_LONG_LOG-8];  // Nombre de esta Bomba
   int capMax;    // Capacidad Máxima (Litros)
   int inven;     // Inventario actual
   int consumo;   // Consumo promedio (Litros*Minutos)

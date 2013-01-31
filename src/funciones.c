@@ -92,7 +92,7 @@ void argumentos_cliente (int num,char ** arreglo, char* nombr, int *inve, int *c
 	continue;
       }
       else if(!strcmp(arreglo[i*2 + 1],"-n")) { 
-	nombr= arreglo[i*2+2];
+	strcpy(nombr, arreglo[i*2+2]);
 	printf("El nombre de la bomba es %s \n", nombr);
 	continue;
       }
@@ -160,7 +160,7 @@ void obtener_argumentos_servidor (int num,char ** arreglo, char* nombr, int *inv
 	while((op=getopt(num,arreglo,"n:i:t:s:p:c:"))!=-1)
 	  switch(op){
 	  case'n':
-	    nombr = optarg;
+	    strcpy(nombr,optarg);
 	    printf("el nombre del centro es: %s \n", nombr);
 	    break;
 	  case'i':
