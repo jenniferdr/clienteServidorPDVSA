@@ -13,7 +13,8 @@
 #include <netdb.h>
 #include <strings.h>
 #define BACK 5
-#define MAX_LONG_LOG 100
+#define MAX_LONG 128
+#define MAX_SERVERS 128
 
 /*Comentar lo que hace cada funcion*/
 

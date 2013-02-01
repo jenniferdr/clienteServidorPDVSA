@@ -12,7 +12,7 @@
 
 int main(int argc, char *argv[]){
 
-  char nombre[MAX_LONG_LOG-8];   // Nombre de este Centro
+  char nombre[MAX_LONG];   // Nombre de este Centro
   int capMax;     // Capacidad Máxima (Litros)
   int inven;      // Inventario actual
   int tiempo;     // Tiempo de respuesta (minutos)
@@ -30,7 +30,7 @@ int main(int argc, char *argv[]){
   int sizeSockadd = sizeof(struct sockaddr_in);
 
   //Configurar el log del servidor
-  char nombre_log[MAX_LONG_LOG];
+  char nombre_log[MAX_LONG];
   sprintf(nombre_log,"log_%s.txt",nombre);
   FILE *log = fopen(nombre_log,"w");
 
