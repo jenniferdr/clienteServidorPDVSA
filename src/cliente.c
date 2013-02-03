@@ -45,20 +45,20 @@ int main(int argc, char *argv[]){
  
   obtener_lista_dns(archivo, nombres,direcciones,&puertos[0]);
  
-  // CONNECT CON SERVIDORES PARA PEDIR TIEMPOS
-  int sock;
-  struct sockaddr_in serv_addr;
-  struct hostent *he;
-
-  /*Crear el socket */
-  if((sock= socket(AF_INET,SOCK_STREAM,0))==-1){
-    perror("Error al crear el socket");
-    exit(-1);
-  }
-
+  
   int k = 0;
   while (direcciones[k]!=NULL){
- 
+    // CONNECT CON SERVIDORES PARA PEDIR TIEMPOS
+    int sock;
+    struct sockaddr_in serv_addr;
+    struct hostent *he;
+    
+    /*Crear el socket */
+    if((sock= socket(AF_INET,SOCK_STREAM,0))==-1){
+      perror("Error al crear el socket");
+      exit(-1);
+    }
+
     if( (he=gethostbyname(direcciones[k])) == NULL){
       /*FIX Si no conoce a un servidor que lo saque de la lista ? o finalizar programa*/
       herror("Error al identificar el host");
@@ -67,14 +67,20 @@ int main(int argc, char *argv[]){
     /*Recopilar los datos del servidor en serv_addr*/
     serv_addr.sin_family = AF_INET;
     serv_addr.sin_port = htons(puertos[k]); 
+   
     serv_addr.sin_addr = *((struct in_addr *)he->h_addr);  
     bzero(&(serv_addr.sin_zero),8);
    
     if(connect(sock,(struct sockaddr*)&serv_addr,sizeof(struct sockaddr_in))==-1){
       // FIX Si no se puede conectar con un servidor 
       //que lo saque de la lista o finalizar programa ?  
-      perror("Error al pedir tiempos \n");
-      exit(-1);
+      printf("Error al pedir tiempos \n del servidor %s en el puerto %d",direcciones[k],puertos[k]);
+      perror("ERROR EN CONEXION");
+      tiempos[k]=500; // Para que sea ignorado de la lista de servidores
+      k = k+1;
+     
+      continue;
+      //  exit(-1);
     }
    
     int tiempoServi;
@@ -85,6 +91,7 @@ int main(int argc, char *argv[]){
     printf("Lei los datos %d \n",tiempoServi);
     tiempos[k]=tiempoServi;
     k = k + 1;
+    shutdown(sock,2);
   }
 
   // ORDENAR EL ARREGLO DE TIEMPOS y TODOS LOS DEMAS 
@@ -109,7 +116,7 @@ int main(int argc, char *argv[]){
     i=i+1;
   }
 
-  // printf("posision 0 %d %s %s %d",tiempos[0], nombres[0], direcciones[0],puertos[0]);
+   printf("posision 0 %d %s %s %d",tiempos[0], nombres[0], direcciones[0],puertos[0]);
 
   // Inicio de la simulación 
   k = 0;
@@ -156,6 +163,7 @@ int main(int argc, char *argv[]){
 	// si me puede atender
 	// ver si el tiempo de dormir es de verdad ese
 	sleep(tiempos[k]); 
+	inven = inven + 38000; 
 	// escribir en logs me atendio 
     
       }

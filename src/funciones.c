@@ -30,6 +30,7 @@ void opciones_servidor(){
   printf("-s <Cantidad De Suministro > \n");
   printf("-t <Tiempo> \n");
   printf("-cp <Numero Capacida Maxima> \n");
+  printf(" -p  <Puerto>");
 }
 
 /*
@@ -70,7 +71,8 @@ void obtener_socket_servidor(int puerto,int *sock){
 
 }
 
-// Comentar
+/*  Realiza la validacion de los argumentos del cliente*/
+/* Que esten completos y que la informacion sea correcta */
 void argumentos_cliente (int numArg,char ** arreglo, char* nombr, int *inve, int *consu, int *camax, char* archi){
   int op;
 
@@ -134,7 +136,7 @@ void argumentos_cliente (int numArg,char ** arreglo, char* nombr, int *inve, int
     }
   }
 }
-
+/* Validar y obtener los argumentos del servidor */
 
 void obtener_argumentos_servidor (int num,char ** arreglo, char* nombr, int *inve, int *tiem, int *sum,int *puert, int *camax){
 
@@ -248,7 +250,7 @@ int obtener_lista_dns(char *filename,char ** nombre,
 	  strcpy(direcciones[i],t);
 	}
 	if (j==2){
-	  //printf("TE es:'%s'\n",t);
+	  // printf("TE es:'%s'\n",t);
 	  puertos[i]=atoi(t); // FIX validar
 	}
 	j=j+1;
