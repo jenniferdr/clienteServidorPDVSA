@@ -12,6 +12,7 @@
 
 int inven; // Inventario actual
 
+// Hilo encargado de llevar el tiempo del servidor
 void *llevar_tiempo(void *arg_tiempo){
 
   int *tiempo= (int*) arg_tiempo;
@@ -21,11 +22,28 @@ void *llevar_tiempo(void *arg_tiempo){
   }
 }
 
-void *atender_cliente(int *socket){
+void *atender_cliente(void *socket){
  
-    printf("Mi socket es: %d \n",*socket);
-    usleep(800000*5);
-    printf("Mi socket sigue siendo: %d\n",*socket);
+  int *mi_socket;
+  mi_socket= (int*)socket;
+  
+  printf("Mi socket es: %d \n",*mi_socket);
+
+  // Verificar si hay disponibilidad
+  // Usar mutex desde aqui
+  if( inven >= 38000 ){
+    inven= inven - 38000;
+    write(*mi_socket,"enviando",sizeof(char)*9);
+  }else{
+    write(*mi_socket,"noDisponible",sizeof(char)*14);
+  }
+  // Cerrar mutex
+
+  printf("Mi socket sigue siendo: %d\n",*mi_socket);
+  
+  // Liberar espacio del socket
+  *mi_socket=-1;
+  //pthread_exit();
 
 }
 
@@ -37,6 +55,7 @@ int main(int argc, char *argv[]){
   int sumi;       // Suministro promedio (Litros*Minutos)
   int puerto;     
   int tiempo_actual;
+  int sockets[MAX_CONCURR];
  
   obtener_argumentos_servidor(argc,argv,nombre,&inven, &tiempo,&sumi,&puerto,&capMax);
 
@@ -62,10 +81,8 @@ int main(int argc, char *argv[]){
   pthread_create(&contador_tiempo,NULL,llevar_tiempo,& tiempo_actual);
 
   int ultimo_tiempo= 0;
-  int k=0;
-  pthread_t dosHilos[2];
 
-  while(1 /*tiempo <=480*/){
+  while(tiempo<480){
     printf("Esperare que un cliente llegue \n");
     printf("Tiempo: %d \n",tiempo_actual);
 
@@ -91,10 +108,16 @@ int main(int argc, char *argv[]){
     if(strcmp(buff,"Tiempo")==0){
       printf("Pidieron tiempo \n");
       write(sock2,&tiempo,sizeof(int));
+
+      // Buscar un espacio libre para el socket
+      int i;
+      for(i=0; i<MAX_CONCURR;i++){
+	if(sockets[i]==-1)break;
+      }
+
       pthread_t trabajador;
-      pthread_create(&dosHilos[k],NULL,atender_cliente,&sock2);
-      k=k+1;
-      sleep(1);
+      pthread_create(&trabajador,NULL,atender_cliente,&sockets[i]);
+     
     }else{
       
     }
