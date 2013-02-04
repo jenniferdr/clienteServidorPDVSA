@@ -155,7 +155,8 @@ int main(int argc, char *argv[]){
       } else {
 	// si me puede atender
 	// ver si el tiempo de dormir es de verdad ese
-	sleep(tiempos[k]); 
+	sleep(tiempos[k]);
+	
 	// escribir en logs me atendio 
     
       }
