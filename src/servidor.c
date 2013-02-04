@@ -22,6 +22,7 @@ void *llevar_tiempo(void *arg_tiempo){
   }
 }
 
+// Hilo encargado de despachar las gandolas
 void *atender_cliente(void *socket){
  
   int *mi_socket;
@@ -114,7 +115,7 @@ int main(int argc, char *argv[]){
       for(i=0; i<MAX_CONCURR;i++){
 	if(sockets[i]==-1)break;
       }
-
+      sockets[i]= sock2;
       pthread_t trabajador;
       pthread_create(&trabajador,NULL,atender_cliente,&sockets[i]);
      
