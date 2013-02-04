@@ -12,6 +12,7 @@
 #include <string.h>
 #include <netdb.h>
 #include <strings.h>
+#include <pthread.h>
 #define BACK 5
 #define MAX_LONG 128
 #define MAX_SERVERS 128
