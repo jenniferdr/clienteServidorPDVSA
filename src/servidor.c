@@ -10,15 +10,25 @@
 
 #include "funciones.h"
 
-int inven; // Inventario actual
+int inventario;  // Inventario actual
+int capMax;      // Capacidad Máxima (Litros)
+int tiempo_actual; // minutos
+int suministro; // Suministro promedio (Litros*Minutos)
+FILE *log;
 
-// Hilo encargado de llevar el tiempo del servidor
+// Hilo encargado de actualizar tiempo e inventario
 void *llevar_tiempo(void *arg_tiempo){
 
   int *tiempo= (int*) arg_tiempo;
   while(*tiempo<=479){
     usleep(100000);
     *tiempo= *tiempo +1;
+    if(inventario+suministro<capMax){
+      inventario= inventario + suministro;
+    }else{
+      inventario= capMax;
+      fprintf(log,"Tanque full: %d minutos \n",tiempo_actual);
+    }
   }
 }
 
@@ -32,8 +42,9 @@ void *atender_cliente(void *socket){
 
   // Verificar si hay disponibilidad
   // Usar mutex desde aqui
-  if( inven >= 38000 ){
-    inven= inven - 38000;
+  if( inventario >= 38000 ){
+    inventario= inventario - 38000;
+    if(inventario==0)fprintf(log,"Tanque vacío: %d minutos",tiempo_actual);
     write(*mi_socket,"enviando",sizeof(char)*9);
   }else{
     write(*mi_socket,"noDisponible",sizeof(char)*14);
@@ -50,40 +61,44 @@ void *atender_cliente(void *socket){
 
 int main(int argc, char *argv[]){
 
-  char nombre[MAX_LONG];   // Nombre de este Centro
-  int capMax;     // Capacidad Máxima (Litros)
-  int tiempo;     // Tiempo de respuesta (minutos)
-  int sumi;       // Suministro promedio (Litros*Minutos)
+  char nombre_centro[MAX_LONG];  
+  int tiempo_respuesta;    
   int puerto;     
-  int tiempo_actual;
   int sockets[MAX_CONCURR];
  
-  obtener_argumentos_servidor(argc,argv,nombre,&inven, &tiempo,&sumi,&puerto,&capMax);
+  obtener_argumentos_servidor(argc,argv,nombre_centro,&inventario, 
+			      &tiempo_respuesta,&suministro,&puerto,&capMax);
+
+  //Configurar el log del servidor
+  char nombre_log[MAX_LONG];
+  sprintf(nombre_log,"log_%s.txt",nombre_centro);
+  log = fopen(nombre_log,"w");
+
+  fprintf(log,"Estado inicial: %d \n",inventario);
+  if(inventario==0) fprintf(log,"Tanque vacio: 0 minutos \n");
+  if(inventario==capMax) fprintf(log,"Tanque full: 0 minutos \n");
+  fflush(log);
+
+  // Iicializar arreglo de sockets 
+  int j;
+  for(j=0; j<MAX_CONCURR;j++){
+    sockets[j]=-1;
+  }
 
   int sock;
   obtener_socket_servidor(puerto,&sock);
-  
+
   /*Datos para el socket cliente*/
   struct sockaddr_in client_addr;
   int sizeSockadd = sizeof(struct sockaddr_in);
 
-  //Configurar el log del servidor
-  char nombre_log[MAX_LONG];
-  sprintf(nombre_log,"log_%s.txt",nombre);
-  FILE *log = fopen(nombre_log,"w");
-
-  fprintf(log,"Estado inicial: %d \n",inven);
-  if(inven==0) fprintf(log,"Tanque vacio: 0 minutos \n");
-  if(inven==capMax) fprintf(log,"Tanque full: 0 minutos \n");
-  fflush(log);
-
   // Iniciar contador de tiempo 
   pthread_t contador_tiempo;
-  pthread_create(&contador_tiempo,NULL,llevar_tiempo,& tiempo_actual);
+  tiempo_actual=0;
+  pthread_create(&contador_tiempo,NULL,llevar_tiempo,&tiempo_actual);
 
-  int ultimo_tiempo= 0;
-
-  while(tiempo<480){
+  //Inicio de la simulacion...
+  while(tiempo_actual<480){
     printf("Esperare que un cliente llegue \n");
     printf("Tiempo: %d \n",tiempo_actual);
 
@@ -92,10 +107,6 @@ int main(int argc, char *argv[]){
       perror("Error al aceptar conexion con el cliente");
       continue;
     }
-    inven= inven + (tiempo - ultimo_tiempo)*sumi;
-    ultimo_tiempo= tiempo;
-
-    printf("Llego el cliente, recibir solicitud \n");
     
     // Recibir solicitud
     char buff[9];
@@ -108,7 +119,7 @@ int main(int argc, char *argv[]){
 
     if(strcmp(buff,"Tiempo")==0){
       printf("Pidieron tiempo \n");
-      write(sock2,&tiempo,sizeof(int));
+      write(sock2,&tiempo_respuesta,sizeof(int));
 
       // Buscar un espacio libre para el socket
       int i;
@@ -120,8 +131,9 @@ int main(int argc, char *argv[]){
       pthread_create(&trabajador,NULL,atender_cliente,&sockets[i]);
      
     }else{
-      
+      //Aqui va lo del if pero mientras para probar esta asi
     }
+    fflush(log);
   }
 
   // Recordar cerrar el archivo al terminar
