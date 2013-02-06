@@ -47,8 +47,11 @@ int main(int argc, char *argv[]){
  
   
   int k = 0;
-  while (direcciones[k]!=NULL){
-    // CONNECT CON SERVIDORES PARA PEDIR TIEMPOS
+ 
+  while (direcciones[k]!= NULL){
+  
+  // CONNECT CON SERVIDORES PARA PEDIR TIEMPOS
+   
     int sock;
     struct sockaddr_in serv_addr;
     struct hostent *he;
@@ -59,10 +62,13 @@ int main(int argc, char *argv[]){
       exit(-1);
     }
 
-    if( (he=gethostbyname(direcciones[k])) == NULL){
+    if((he=gethostbyname(direcciones[k])) == NULL){
       /*FIX Si no conoce a un servidor que lo saque de la lista ? o finalizar programa*/
-      herror("Error al identificar el host");
-      exit(-1);
+      
+      perror("Error al identificar el host");
+      // exit(-1);
+       k=k+1;
+      continue;
     }
     /*Recopilar los datos del servidor en serv_addr*/
     serv_addr.sin_family = AF_INET;
@@ -119,10 +125,11 @@ int main(int argc, char *argv[]){
    printf("posision 0 %d %s %s %d",tiempos[0], nombres[0], direcciones[0],puertos[0]);
 
   // Inicio de la simulación 
-  k = 0;
-  int tiempo=0;
+  int r = 0;
+  int tiempo = 0;
   while (tiempo <= 480){
     if ((capMax-inven)>=38000){
+      // necesito gasolina
       // Pedir Gasolina
       int sock;
       struct sockaddr_in serv_addr;
@@ -132,16 +139,17 @@ int main(int argc, char *argv[]){
  
       struct hostent *he;
       /*Colocar aqui el nombre extraido del archivo!!!*/
-      if( (he=gethostbyname(direcciones[k])) == NULL){
+      if( (he=gethostbyname(direcciones[r])) == NULL){
 	/*Pedir gasolina a otro servidor*/
 	herror("Error al identificar el host");
 	exit(-1);
 	/*Se pueden salvar valores para usar despues ¿?*/
       }
+      
       /*Recopilar los datos del servidor en serv_addr*/
       serv_addr.sin_family = AF_INET;
       // FIX
-      serv_addr.sin_port = htons(puertos[k]); 
+      serv_addr.sin_port = htons(puertos[r]); 
       serv_addr.sin_addr = *((struct in_addr *)he->h_addr);  
       bzero(&(serv_addr.sin_zero),8);
      
@@ -149,28 +157,31 @@ int main(int argc, char *argv[]){
 	perror("connect() error\n");
 	exit(-1);
       }
+      
       // imprimir en los logs pidiendo gasolina 
-      int gasolina;
-      write(sock,"gasolina",9);
+      char* gasolina;
+      write(sock,nombre,9);
       read(sock,&gasolina,sizeof(int));
       // poner un numero para no te puedo atender
-      if (gasolina == 10){
+      if (gasolina == "noDisponible"){
 	// no me puede atender
-	k=k+1;
+	r=r+1;
 	continue; 
 
       } else {
 	// si me puede atender
 	// ver si el tiempo de dormir es de verdad ese
-	sleep(tiempos[k]); 
+	sleep(tiempos[r]); 
 	inven = inven + 38000; 
 	// escribir en logs me atendio 
     
       }
-      printf("Lei los datos %d \n",gasolina);
+      printf("Lei los datos %s \n",gasolina);
       return 0;
      
     } else {
+      printf("tiempo es %d",tiempo);
+   
       usleep(100000);
       inven= inven - consumo;
       tiempo = tiempo + 1;

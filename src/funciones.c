@@ -259,7 +259,7 @@ int obtener_lista_dns(char *filename,char ** nombre,
       }
       i=i+1;
     }
-
+   
     free(t);
     puertos[i]=0;
     direcciones[i]= NULL;

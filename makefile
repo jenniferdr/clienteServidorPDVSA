@@ -1,8 +1,8 @@
-all:  src/funciones.o src/clientePrueba.o src/servidor.o
-	gcc src/funciones.o src/clientePrueba.o -o bomba
+all:  src/funciones.o src/cliente.o src/servidor.o
+	gcc src/funciones.o src/cliente.o -o bomba
 	gcc src/funciones.o src/servidor.o -pthread -o centro
-cliente.o: src/clientePrueba.c src/funciones.h 
-	gcc -c src/clientePrueba.c -o src/clientePrueba.o
+cliente.o: src/cliente.c src/funciones.h 
+	gcc -c src/cliente.c -o src/cliente.o
 
 servidor.o: src/servidor.c src/funciones.h
 	gcc -c src/servidor.c -o src/servidor.o
