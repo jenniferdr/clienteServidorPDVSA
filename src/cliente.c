@@ -162,13 +162,8 @@ int main(int argc, char *argv[]){
       } else {
 	// si me puede atender
 	// ver si el tiempo de dormir es de verdad ese
-<<<<<<< HEAD
-	sleep(tiempos[k]);
-	
-=======
 	sleep(tiempos[k]); 
 	inven = inven + 38000; 
->>>>>>> 69a34b8328464122a89e46e50e6aaaf7894b4463
 	// escribir en logs me atendio 
     
       }
