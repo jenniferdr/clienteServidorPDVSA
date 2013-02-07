@@ -17,7 +17,9 @@ int tiempo_actual; // minutos
 int suministro; // Suministro promedio (Litros*Minutos)
 FILE *log;
 
+pthread_mutex_t mutex;
 // Hilo encargado de actualizar tiempo e inventario
+
 void *llevar_tiempo(void *arg_tiempo){
   // detach()
   int *tiempo= (int*) arg_tiempo;
@@ -44,6 +46,7 @@ void *atender_cliente(void *socket){
 
   // Verificar si hay disponibilidad
   // Usar mutex desde aqui
+ pthread_mutex_lock(&mutex);
   if( inventario >= 38000 ){
     inventario= inventario - 38000;
     if(inventario==0)fprintf(log,"Tanque vacío: %d minutos",tiempo_actual);
@@ -51,6 +54,7 @@ void *atender_cliente(void *socket){
   }else{
     write(*mi_socket,"noDisponible",sizeof(char)*14);
   }
+   pthread_mutex_unlock(&mutex);
   // Cerrar mutex
 
   printf("Mi socket sigue siendo: %d\n",*mi_socket);
