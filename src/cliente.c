@@ -45,11 +45,12 @@ int main(int argc, char *argv[]){
  
   obtener_lista_dns(archivo, nombres,direcciones,&puertos[0]);
  
-  
   int k = 0;
  
-  while (direcciones[k]!= NULL){
-  
+  while ((direcciones[k])!= NULL){
+    printf("Iteracion %d \n",k);
+    //printf("Iteracion %d, %s \n",k,direcciones[k]);
+    printf("Hola =) \n");
   // CONNECT CON SERVIDORES PARA PEDIR TIEMPOS
    
     int sock;
@@ -59,6 +60,7 @@ int main(int argc, char *argv[]){
     /*Crear el socket */
     if((sock= socket(AF_INET,SOCK_STREAM,0))==-1){
       perror("Error al crear el socket");
+      continue;
       exit(-1);
     }
 
@@ -104,8 +106,10 @@ int main(int argc, char *argv[]){
   int i = 0 ;
   int minimo;
   int j;
- 
+
+
   while (nombres[i]!=NULL){
+    printf("Nombre %d: %s",i,nombres[i]);
     minimo = i;
     j = i + 1;
     while (nombres[j]!=NULL){

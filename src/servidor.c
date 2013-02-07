@@ -19,7 +19,7 @@ FILE *log;
 
 // Hilo encargado de actualizar tiempo e inventario
 void *llevar_tiempo(void *arg_tiempo){
-
+  // detach()
   int *tiempo= (int*) arg_tiempo;
   while(*tiempo<=479){
     usleep(100000);
@@ -31,15 +31,31 @@ void *llevar_tiempo(void *arg_tiempo){
       fprintf(log,"Tanque full: %d minutos \n",tiempo_actual);
     }
   }
+  //pthread_exit()
 }
 
 // Hilo encargado de despachar las gandolas
 void *atender_cliente(void *socket){
- 
+  // detach()
   int *mi_socket;
   mi_socket= (int*)socket;
   
-  printf("Mi socket es: %d \n",*mi_socket);
+  if(strcmp(buff,"Tiempo")==0){
+    printf("Pidieron tiempo \n");
+    write(sock2,&tiempo_respuesta,sizeof(int));
+
+    // Buscar un espacio libre para el socket
+    int i;
+    for(i=0; i<MAX_CONCURR;i++){
+      if(sockets[i]==-1)break;
+    }
+    sockets[i]= sock2;
+    pthread_t trabajador;
+    pthread_create(&trabajador,NULL,atender_cliente,&sockets[i]);
+     
+  }else{
+    //Aqui va lo del if pero mientras para probar esta asi
+  }
 
   // Verificar si hay disponibilidad
   // Usar mutex desde aqui
@@ -118,22 +134,7 @@ int main(int argc, char *argv[]){
       continue;
     }
 
-    if(strcmp(buff,"Tiempo")==0){
-      printf("Pidieron tiempo \n");
-      write(sock2,&tiempo_respuesta,sizeof(int));
-
-      // Buscar un espacio libre para el socket
-      int i;
-      for(i=0; i<MAX_CONCURR;i++){
-	if(sockets[i]==-1)break;
-      }
-      sockets[i]= sock2;
-      pthread_t trabajador;
-      pthread_create(&trabajador,NULL,atender_cliente,&sockets[i]);
-     
-    }else{
-      //Aqui va lo del if pero mientras para probar esta asi
-    }
+   
     fflush(log);
   }
 

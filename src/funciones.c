@@ -258,12 +258,14 @@ int obtener_lista_dns(char *filename,char ** nombre,
 	t = strtok (NULL, "&\n");
       }
       i=i+1;
+      printf("Valor de i: %d \n",i);
     }
    
     free(t);
-    puertos[i]=0;
-    direcciones[i]= NULL;
-    nombre[i]=NULL;
+    puertos[i-1]=0;
+    direcciones[i-1]= NULL;
+    printf("Posicion del arreglo %d \n",i);
+    nombre[i-1]=NULL;
     fclose ( file );
  
   }else{
