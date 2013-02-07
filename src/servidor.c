@@ -16,34 +16,50 @@ int capMax;      // Capacidad Máxima (Litros)
 int tiempo_actual; // minutos
 int suministro; // Suministro promedio (Litros*Minutos)
 FILE *log;
+pthread_mutex_t mutex; // mutex sobre el inventario
+int tiempo_respuesta;
 
 pthread_mutex_t mutex;
 // Hilo encargado de actualizar tiempo e inventario
 
 void *llevar_tiempo(void *arg_tiempo){
-  // detach()
+  pthread_detach(pthread_self());
+
   int *tiempo= (int*) arg_tiempo;
-  while(*tiempo<=479){
+  while(*tiempo<480){
+    
     usleep(100000);
     *tiempo= *tiempo +1;
+
+    pthread_mutex_lock(&mutex);
     if(inventario+suministro<capMax){
       inventario= inventario + suministro;
-    }else{
+    }else if(inventario!=capMax){
       inventario= capMax;
       fprintf(log,"Tanque full: %d minutos \n",tiempo_actual);
     }
+    pthread_mutex_unlock(&mutex);
+
   }
-  //pthread_exit()
+  pthread_exit(0);
 }
 
 // Hilo encargado de despachar las gandolas
 void *atender_cliente(void *socket){
-  // detach()
+  pthread_detach(pthread_self());
+
   int *mi_socket;
   mi_socket= (int*)socket;
   
- 
+  // Recibir solicitud
+  char buff[9];
+  int recibidos;
+  if( (recibidos= recv(*mi_socket,buff,9,0) < 9)){
+    perror("Error al recibir el mensaje");
+    // No se si hay que avisar al hijo 
+  }
 
+/*<<<<<<< HEAD
   // Verificar si hay disponibilidad
   // Usar mutex desde aqui
  pthread_mutex_lock(&mutex);
@@ -51,24 +67,41 @@ void *atender_cliente(void *socket){
     inventario= inventario - 38000;
     if(inventario==0)fprintf(log,"Tanque vacío: %d minutos",tiempo_actual);
     write(*mi_socket,"enviando",sizeof(char)*9);
+=======*/
+  if(strcmp(buff,"Tiempo")==0){
+    //Pidieron tiempo
+    write(*mi_socket,&tiempo_respuesta,sizeof(int));  
+//>>>>>>> d3637eb9068e4bb010fa24f7a7d50116e01cffb9
   }else{
-    write(*mi_socket,"noDisponible",sizeof(char)*14);
+    // Verificar si hay disponibilidad
+    pthread_mutex_lock(&mutex);
+    if( inventario >= 38000 ){
+      inventario= inventario - 38000;
+      if(inventario==0)fprintf(log,"Tanque vacío: %d minutos",tiempo_actual);
+      write(*mi_socket,"enviando",sizeof(char)*9);
+      fprintf(log,"Suministro: %d minutos, %s, OK, %d litros"
+	      ,tiempo_actual,buff,inventario);
+    }else{
+      write(*mi_socket,"noDisponible",sizeof(char)*14);
+      fprintf(log,"Suministro: %d minutos, %s, No disponible, %d litros"
+	      ,tiempo_actual,buff,inventario);
+    }
+    pthread_mutex_unlock(&mutex);
   }
    pthread_mutex_unlock(&mutex);
   // Cerrar mutex
 
-  printf("Mi socket sigue siendo: %d\n",*mi_socket);
-  
   // Liberar espacio del socket
   *mi_socket=-1;
-  //pthread_exit();
+  // cerrar socket
+  shutdown(*mi_socket,2);
+  pthread_exit(0);
 
 }
 
 int main(int argc, char *argv[]){
 
-  char nombre_centro[MAX_LONG];  
-  int tiempo_respuesta;    
+  char nombre_centro[MAX_LONG];      
   int puerto;     
   int sockets[MAX_CONCURR];
  
@@ -114,35 +147,20 @@ int main(int argc, char *argv[]){
       continue;
     }
     
-    // Recibir solicitud
-    char buff[9];
-    int recibidos;
-    if( (recibidos= recv(sock2,buff,9,0) < 9)){
-      perror("Error al recibir el mensaje");
-      // No se si hay que avisar al hijo 
-      continue;
-    }
- if(strcmp(buff,"Tiempo")==0){
-    printf("Pidieron tiempo \n");
-    write(sock2,&tiempo_respuesta,sizeof(int));
-
     // Buscar un espacio libre para el socket
     int i;
     for(i=0; i<MAX_CONCURR;i++){
       if(sockets[i]==-1)break;
     }
     sockets[i]= sock2;
+
     pthread_t trabajador;
     pthread_create(&trabajador,NULL,atender_cliente,&sockets[i]);
-     
-  }else{
-    //Aqui va lo del if pero mientras para probar esta asi
-  }
    
     fflush(log);
   }
 
-  // Recordar cerrar el archivo al terminar
+  fclose(log);
   return 0;
 
 

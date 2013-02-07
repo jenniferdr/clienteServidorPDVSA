@@ -48,10 +48,9 @@ int main(int argc, char *argv[]){
   printf("Mi inventario es %d \n ", inven);
   int k = 0;
  
-  while (direcciones[k]!= NULL){
-   
-  // CONNECT CON SERVIDORES PARA PEDIR TIEMPOS
-   
+  while ((direcciones[k])!= NULL){
+    printf("Iteracion %d \n",k);
+    // CONNECT CON SERVIDORES PARA PEDIR TIEMPOS
     int sock;
     struct sockaddr_in serv_addr;
     struct hostent *he;
@@ -102,15 +101,15 @@ int main(int argc, char *argv[]){
     tiempos[k] = tiempoServi;
     k = k + 1;
     shutdown(sock,2);
-    
- 
+    printf("Termine iteracion %d \n",k-1);
   }
  
   // ORDENAR EL ARREGLO DE TIEMPOS y TODOS LOS DEMAS 
   int i = 0 ;
   int minimo;
   int j;
- 
+  printf("Hola voy a ordenar \n");
+
   while (nombres[i]!=NULL){
    
     minimo = i;

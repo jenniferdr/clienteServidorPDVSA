@@ -4,7 +4,8 @@
 
 #include "funciones.h"
 
-// Falta Documentar y quitar prints y validar cosas 
+// Falta Documentar y quitar prints y validar cosas
+// Que un argumento depende de otro 
 
 /*
  * Muestra por pantalla la sintaxis correcta para 
@@ -89,7 +90,7 @@ void argumentos_cliente (int numArg,char ** arreglo, char* nombr, int *inve, int
       if(!strcmp(arreglo[i*2 + 1],"-c")) { 
 
 	*consu= atoi(arreglo[i*2+2]); // FIX Validar !!
-	if (0 < *consu && *consu < 1000){
+	if (0 <= *consu && *consu <= 1000){
 	  printf("El consumo es %d \n", *consu);
 	}else{ 
 	  perror("El numero del consumo debe estar en [0 - 1000]\n");
@@ -105,7 +106,7 @@ void argumentos_cliente (int numArg,char ** arreglo, char* nombr, int *inve, int
       }else if(!strcmp(arreglo[i*2 + 1],"-i")) { 
 	
 	*inve= atoi(arreglo[i*2+2]);     // FIX Validar !!
-	if (0 < *inve && *inve < *camax){
+	if (0 <= *inve && *inve <= *camax){
 	  printf(" inventario es %d \n", *inve);
 	}else{
 	  perror("ERROR: El numero del Inventario no corresponde\n  Debe estar en [0 - capacidadMaxima]");
@@ -120,7 +121,7 @@ void argumentos_cliente (int numArg,char ** arreglo, char* nombr, int *inve, int
       }else if(!strcmp(arreglo[i*2 + 1],"-cp")) { 
 
 	*camax = atoi(arreglo[i*2+2]); // FIX Validar !	
-	if (38000 < *camax && *camax < 380000){
+	if (38000 <= *camax && *camax <= 380000){
 	  printf("La Capacidad maxima es: %d \n", *camax);
 	}else{ 
 	  perror("El Numero de Capacidad Maxima \n Debe estar en [38000 - 3800000]\n");
@@ -152,7 +153,7 @@ void obtener_argumentos_servidor (int num,char ** arreglo, char* nombr, int *inv
 	  
 	*camax = atoi(arreglo[i*2+2]); // FIX Validar !!
 	    
-	if (38000 < *camax && *camax < 380000){
+	if (38000 <= *camax && *camax <= 380000){
 	  cp = true; 
 	  printf("La Capacidad maxima es: %d \n", *camax);
 	}else { 
@@ -180,7 +181,7 @@ void obtener_argumentos_servidor (int num,char ** arreglo, char* nombr, int *inv
 	case'i':
 	  *inve = atoi(optarg); // FIX Validar !!
 	   
-	  if (0 < *inve && *inve < *camax){
+	  if (0 <= *inve && *inve <= *camax){
 	    printf(" inventario es %d \n", *inve);
 	  }else{
 	    perror("ERROR: El numero del Inventario no corresponde\n  Debe estar en [0 - capacidadMaxima]");
@@ -189,7 +190,7 @@ void obtener_argumentos_servidor (int num,char ** arreglo, char* nombr, int *inv
 	  break;
 	case't':
 	  *tiem = atoi(optarg); // FIX Validar !!
-	  if (0 <  *tiem && *tiem < 180){
+	  if (0 <=  *tiem && *tiem <= 180){
 	    printf("tiempo es: %d \n",*tiem );
 	  }else{ 
 	    perror("ERROR: El numero del Tiempo no corresponde  \n Debe estar en [0 - 180]");
@@ -198,7 +199,7 @@ void obtener_argumentos_servidor (int num,char ** arreglo, char* nombr, int *inv
 	  break;
 	case's':
 	  *sum = atoi(optarg); // FIX Validar !!
-	  if (0 <  *sum && *sum < 10000){
+	  if (0 <=  *sum && *sum <= 10000){
 	    printf("el suministro es: %d \n",*sum );
 	  }else{ 
 	    perror("ERROR: , El numero del suministro no es valido \n DEbe estar en [0 - 10000]");
