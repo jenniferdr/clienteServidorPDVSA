@@ -45,12 +45,11 @@ int main(int argc, char *argv[]){
  
   obtener_lista_dns(archivo, nombres,direcciones,&puertos[0]);
  
+  printf("Mi inventario es %d \n ", inven);
   int k = 0;
  
-  while ((direcciones[k])!= NULL){
-    printf("Iteracion %d \n",k);
-    //printf("Iteracion %d, %s \n",k,direcciones[k]);
-    printf("Hola =) \n");
+  while (direcciones[k]!= NULL){
+   
   // CONNECT CON SERVIDORES PARA PEDIR TIEMPOS
    
     int sock;
@@ -60,7 +59,6 @@ int main(int argc, char *argv[]){
     /*Crear el socket */
     if((sock= socket(AF_INET,SOCK_STREAM,0))==-1){
       perror("Error al crear el socket");
-      continue;
       exit(-1);
     }
 
@@ -69,8 +67,11 @@ int main(int argc, char *argv[]){
       
       perror("Error al identificar el host");
       // exit(-1);
-       k=k+1;
+      tiempos[k]=500; // Para que sea ignorado de la lista de servidores
+      
+      k=k+1;
       continue;
+
     }
     /*Recopilar los datos del servidor en serv_addr*/
     serv_addr.sin_family = AF_INET;
@@ -84,32 +85,34 @@ int main(int argc, char *argv[]){
       //que lo saque de la lista o finalizar programa ?  
       printf("Error al pedir tiempos \n del servidor %s en el puerto %d",direcciones[k],puertos[k]);
       perror("ERROR EN CONEXION");
-      tiempos[k]=500; // Para que sea ignorado de la lista de servidores
+      tiempos[k] = 500; // Para que sea ignorado de la lista de servidores
       k = k+1;
-     
+      
       continue;
-      //  exit(-1);
+      // exit(-1);
     }
-   
+    
     int tiempoServi;
     // FIX Validar estas llamadas 
+  
     write(sock,"Tiempo",9);
     read(sock,&tiempoServi,sizeof(int));
-   
+  
     printf("Lei los datos %d \n",tiempoServi);
-    tiempos[k]=tiempoServi;
+    tiempos[k] = tiempoServi;
     k = k + 1;
     shutdown(sock,2);
+    
+ 
   }
-
+ 
   // ORDENAR EL ARREGLO DE TIEMPOS y TODOS LOS DEMAS 
   int i = 0 ;
   int minimo;
   int j;
-
-
+ 
   while (nombres[i]!=NULL){
-    printf("Nombre %d: %s",i,nombres[i]);
+   
     minimo = i;
     j = i + 1;
     while (nombres[j]!=NULL){
@@ -126,13 +129,14 @@ int main(int argc, char *argv[]){
     i=i+1;
   }
 
-   printf("posision 0 %d %s %s %d",tiempos[0], nombres[0], direcciones[0],puertos[0]);
+   printf("posision 0 %d %s %s %d \n",tiempos[0], nombres[0], direcciones[0],puertos[0]);
 
   // Inicio de la simulación 
   int r = 0;
   int tiempo = 0;
   while (tiempo <= 480){
     if ((capMax-inven)>=38000){
+   
       // necesito gasolina
       // Pedir Gasolina
       int sock;
@@ -161,22 +165,29 @@ int main(int argc, char *argv[]){
 	perror("connect() error\n");
 	exit(-1);
       }
-      
+      printf("Solicitando Gasolina, en el tiempo %d ,al servidor %s", tiempo, nombres[r]);
       // imprimir en los logs pidiendo gasolina 
       char* gasolina;
       write(sock,nombre,9);
+      printf("salgo !!!!\n");
+
       read(sock,&gasolina,sizeof(int));
       // poner un numero para no te puedo atender
       if (gasolina == "noDisponible"){
 	// no me puede atender
+	printf("no me puede atender");
 	r=r+1;
 	continue; 
 
       } else {
 	// si me puede atender
 	// ver si el tiempo de dormir es de verdad ese
+	printf(" me puede atender");
+	
 	sleep(tiempos[r]); 
 	inven = inven + 38000; 
+	printf("Llegada Gandola : tiempo %d inventario %d", tiempo, inven);
+		
 	// escribir en logs me atendio 
     
       }
@@ -184,6 +195,8 @@ int main(int argc, char *argv[]){
       return 0;
      
     } else {
+       printf("Tanque Full %d",tiempo);
+   
       printf("tiempo es %d",tiempo);
    
       usleep(100000);
