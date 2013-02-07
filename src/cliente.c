@@ -8,10 +8,9 @@
  *          Jennifer Dos Reis
  */
 
-
 #include "funciones.h"
 int main(int argc, char *argv[]){
-
+  FILE *log;
   char nombre[MAX_LONG];  // Nombre de esta Bomba
   int capMax;             // Capacidad Máxima (Litros)
   int inven;              // Inventario actual
@@ -45,11 +44,17 @@ int main(int argc, char *argv[]){
  
   obtener_lista_dns(archivo, nombres,direcciones,&puertos[0]);
  
-  printf("Mi inventario es %d \n ", inven);
+  // creacion del archivo log del cliente
+  char nombre_log[MAX_LONG];
+  sprintf(nombre_log,"log_%s.txt",nombre);
+  log = fopen(nombre_log,"w");
+
+
+  fprintf(log,"Estado inicial %d \n ", inven);
   int k = 0;
  
   while ((direcciones[k])!= NULL){
-    printf("Iteracion %d \n",k);
+   
     // CONNECT CON SERVIDORES PARA PEDIR TIEMPOS
     int sock;
     struct sockaddr_in serv_addr;
@@ -62,11 +67,9 @@ int main(int argc, char *argv[]){
     }
 
     if((he=gethostbyname(direcciones[k])) == NULL){
-      /*FIX Si no conoce a un servidor que lo saque de la lista ? o finalizar programa*/
       
       perror("Error al identificar el host");
-      // exit(-1);
-      tiempos[k]=500; // Para que sea ignorado de la lista de servidores
+      tiempos[k] = 500; // Para que sea ignorado de la lista de servidores
       
       k=k+1;
       continue;
@@ -80,15 +83,11 @@ int main(int argc, char *argv[]){
     bzero(&(serv_addr.sin_zero),8);
    
     if(connect(sock,(struct sockaddr*)&serv_addr,sizeof(struct sockaddr_in))==-1){
-      // FIX Si no se puede conectar con un servidor 
-      //que lo saque de la lista o finalizar programa ?  
       printf("Error al pedir tiempos \n del servidor %s en el puerto %d",direcciones[k],puertos[k]);
       perror("ERROR EN CONEXION");
       tiempos[k] = 500; // Para que sea ignorado de la lista de servidores
       k = k+1;
-      
       continue;
-      // exit(-1);
     }
     
     int tiempoServi;
@@ -97,18 +96,18 @@ int main(int argc, char *argv[]){
     write(sock,"Tiempo",9);
     read(sock,&tiempoServi,sizeof(int));
   
-    printf("Lei los datos %d \n",tiempoServi);
+    //   printf("Lei los datos %d \n",tiempoServi);
     tiempos[k] = tiempoServi;
     k = k + 1;
     shutdown(sock,2);
-    printf("Termine iteracion %d \n",k-1);
+    //  printf("Termine iteracion %d \n",k-1);
   }
  
   // ORDENAR EL ARREGLO DE TIEMPOS y TODOS LOS DEMAS 
   int i = 0 ;
   int minimo;
   int j;
-  printf("Hola voy a ordenar \n");
+  // printf("Hola voy a ordenar \n");
 
   while (nombres[i]!=NULL){
    
@@ -128,16 +127,18 @@ int main(int argc, char *argv[]){
     i=i+1;
   }
 
-   printf("posision 0 %d %s %s %d \n",tiempos[0], nombres[0], direcciones[0],puertos[0]);
-
+ 
   // Inicio de la simulación 
   int r = 0;
   int tiempo = 0;
   while (tiempo <= 480){
+    // Si se puede recibir una gandola
+    if (inven==0){fprintf(log,"tanque vacio en el tiempo : %d\n", tiempo);}
+
+    if (inven==capMax){ fprintf(log,"Tanque Full %d\n",tiempo);}
+    fflush(log);
+
     if ((capMax-inven)>=38000){
-   
-      // necesito gasolina
-      // Pedir Gasolina
       int sock;
       struct sockaddr_in serv_addr;
       /*Crear el socket */
@@ -149,61 +150,60 @@ int main(int argc, char *argv[]){
       if( (he=gethostbyname(direcciones[r])) == NULL){
 	/*Pedir gasolina a otro servidor*/
 	herror("Error al identificar el host");
-	exit(-1);
+	//	exit(-1);
 	/*Se pueden salvar valores para usar despues ¿?*/
+	r = r + 1;
+	continue;
       }
       
       /*Recopilar los datos del servidor en serv_addr*/
       serv_addr.sin_family = AF_INET;
       // FIX
+      if (puertos[r]==500){ r = r +1; continue;} 
       serv_addr.sin_port = htons(puertos[r]); 
       serv_addr.sin_addr = *((struct in_addr *)he->h_addr);  
       bzero(&(serv_addr.sin_zero),8);
-     
+      
       if(connect(sock,(struct sockaddr*)&serv_addr,sizeof(struct sockaddr_in))==-1){ 
 	perror("connect() error\n");
-	exit(-1);
+	// exit(-1);
+	r = r + 1;
+	continue;
+	
       }
-      printf("Solicitando Gasolina, en el tiempo %d ,al servidor %s", tiempo, nombres[r]);
-      // imprimir en los logs pidiendo gasolina 
       char* gasolina;
       write(sock,nombre,9);
-      printf("salgo !!!!\n");
-
-      read(sock,&gasolina,sizeof(int));
-      // poner un numero para no te puedo atender
-      if (gasolina == "noDisponible"){
-	// no me puede atender
-	printf("no me puede atender");
-	r=r+1;
-	continue; 
-
-      } else {
-	// si me puede atender
-	// ver si el tiempo de dormir es de verdad ese
-	printf(" me puede atender");
-	
-	sleep(tiempos[r]); 
-	inven = inven + 38000; 
-	printf("Llegada Gandola : tiempo %d inventario %d", tiempo, inven);
-		
-	// escribir en logs me atendio 
-    
-      }
-      printf("Lei los datos %s \n",gasolina);
-      return 0;
+      
+	read(sock,gasolina,sizeof(char)*14);
+	printf("loque recibo%s", gasolina);
+	// poner un numero para no te puedo atender
+	if (gasolina == "noDisponible"){
+	  fprintf(log,"Peticion: Tiempo %d, Nombre Centro %s , Nodisponible\n", tiempo, nombres[r]);
+	  r=r+1;
+	  continue; 
+	  
+	} else {
+	  // ver si el tiempo de dormir es de verdad ese
+	  fprintf(log,"Peticion: Tiempo %d, Nombre Centro %s ,Disponible\n", tiempo, nombres[r]);
+	  
+	  sleep(tiempos[r]); 
+	  inven = inven + 38000; 
+	  fprintf(log,"Llegada Gandola : tiempo %d inventario %d\n", tiempo,inven);
+ 	}
+	//printf("Lei los datos %s \n",gasolina);
+	//  return 0;
      
     } else {
-       printf("Tanque Full %d",tiempo);
-   
+     
       printf("tiempo es %d",tiempo);
    
       usleep(100000);
-      inven= inven - consumo;
+      inven = inven - consumo;
       tiempo = tiempo + 1;
     } 
 
   }
+  fclose(log);
  
   return 0;
 }

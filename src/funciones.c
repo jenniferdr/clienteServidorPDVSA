@@ -121,13 +121,6 @@ void argumentos_cliente (int numArg,char ** arreglo, char* nombr, int *inve, int
       }else if(!strcmp(arreglo[i*2 + 1],"-cp")) { 
 
 	*camax = atoi(arreglo[i*2+2]); // FIX Validar !	
-	if (38000 <= *camax && *camax <= 380000){
-	  printf("La Capacidad maxima es: %d \n", *camax);
-	}else{ 
-	  perror("El Numero de Capacidad Maxima \n Debe estar en [38000 - 3800000]\n");
-	  // FIX Salir de la funcion para cerrar el programa !!
-	  exit(-1);
-	}
 
       }else{
 	perror("Sintaxis invalida");
@@ -135,6 +128,14 @@ void argumentos_cliente (int numArg,char ** arreglo, char* nombr, int *inve, int
 	exit(-1);
       } 
     }
+    if (38000 <= *camax && *camax <= 380000){
+      printf("La Capacidad maxima es: %d \n", *camax);
+    }else{ 
+      perror("El Numero de Capacidad Maxima \n Debe estar en [38000 - 3800000]\n");
+      // FIX Salir de la funcion para cerrar el programa !!
+	  exit(-1);
+    }
+    
   }
 }
 /* Validar y obtener los argumentos del servidor */

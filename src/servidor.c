@@ -18,8 +18,6 @@ int suministro; // Suministro promedio (Litros*Minutos)
 FILE *log;
 pthread_mutex_t mutex; // mutex sobre el inventario
 int tiempo_respuesta;
-
-pthread_mutex_t mutex;
 // Hilo encargado de actualizar tiempo e inventario
 
 void *llevar_tiempo(void *arg_tiempo){
@@ -86,7 +84,7 @@ void *atender_cliente(void *socket){
       fprintf(log,"Suministro: %d minutos, %s, No disponible, %d litros"
 	      ,tiempo_actual,buff,inventario);
     }
-    pthread_mutex_unlock(&mutex);
+    // pthread_mutex_unlock(&mutex);
   }
    pthread_mutex_unlock(&mutex);
   // Cerrar mutex
