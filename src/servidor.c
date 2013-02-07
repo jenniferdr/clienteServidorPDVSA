@@ -40,22 +40,7 @@ void *atender_cliente(void *socket){
   int *mi_socket;
   mi_socket= (int*)socket;
   
-  if(strcmp(buff,"Tiempo")==0){
-    printf("Pidieron tiempo \n");
-    write(sock2,&tiempo_respuesta,sizeof(int));
-
-    // Buscar un espacio libre para el socket
-    int i;
-    for(i=0; i<MAX_CONCURR;i++){
-      if(sockets[i]==-1)break;
-    }
-    sockets[i]= sock2;
-    pthread_t trabajador;
-    pthread_create(&trabajador,NULL,atender_cliente,&sockets[i]);
-     
-  }else{
-    //Aqui va lo del if pero mientras para probar esta asi
-  }
+ 
 
   // Verificar si hay disponibilidad
   // Usar mutex desde aqui
@@ -133,7 +118,22 @@ int main(int argc, char *argv[]){
       // No se si hay que avisar al hijo 
       continue;
     }
+ if(strcmp(buff,"Tiempo")==0){
+    printf("Pidieron tiempo \n");
+    write(sock2,&tiempo_respuesta,sizeof(int));
 
+    // Buscar un espacio libre para el socket
+    int i;
+    for(i=0; i<MAX_CONCURR;i++){
+      if(sockets[i]==-1)break;
+    }
+    sockets[i]= sock2;
+    pthread_t trabajador;
+    pthread_create(&trabajador,NULL,atender_cliente,&sockets[i]);
+     
+  }else{
+    //Aqui va lo del if pero mientras para probar esta asi
+  }
    
     fflush(log);
   }
