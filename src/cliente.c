@@ -170,39 +170,49 @@ int main(int argc, char *argv[]){
 	continue;
 	
       }
+<
       char* gasolina;
       write(sock,nombre,sizeof(char)*9);
       
-	read(sock,gasolina,sizeof(char)*14);
-	printf("loque recibo%s", gasolina);
-	// poner un numero para no te puedo atender
-	if (gasolina == "noDisponible"){
-	  fprintf(log,"Peticion: Tiempo %d, Nombre Centro %s , Nodisponible\n", tiempo, nombres[r]);
-	  r=r+1;
-	  continue; 
-	  
-	} else {
+      write(sock,nombre,MAX_LONG);
+      char gasolina[14];
+      int recibidos;
+      if( (recibidos= recv(sock,gasolina,14,0) < 14)){
+	perror("Error al recibir el mensaje");
+      }
+     
+      
+      // read(sock,gasolina,sizeof(char)*14);
+      printf("loque recibo%s", gasolina);
+      // poner un numero para no te puedo atender
+      if (gasolina == "noDisponible"){
+	fprintf(log,"Peticion: Tiempo %d, Nombre Centro %s , Nodisponible\n", tiempo, nombres[r]);
+	r=r+1;
+	continue; 
+	
+      } else {
 	  // ver si el tiempo de dormir es de verdad ese
-	  fprintf(log,"Peticion: Tiempo %d, Nombre Centro %s ,Disponible\n", tiempo, nombres[r]);
-	  
-	  sleep(tiempos[r]); 
-	  inven = inven + 38000; 
-	  fprintf(log,"Llegada Gandola : tiempo %d inventario %d\n", tiempo,inven);
+	fprintf(log,"Peticion: Tiempo %d, Nombre Centro %s ,Disponible\n", tiempo, nombres[r]);
+	
+	sleep(tiempos[r]); 
+	inven = inven + 38000; 
+	fprintf(log,"Llegada Gandola : tiempo %d inventario %d\n", tiempo,inven);
  	}
-	//printf("Lei los datos %s \n",gasolina);
-	//  return 0;
-     
+      //printf("Lei los datos %s \n",gasolina);
+      //  return 0;
+      
     } else {
-     
+      
       printf("tiempo es %d",tiempo);
-   
+      
       usleep(100000);
       inven = inven - consumo;
       tiempo = tiempo + 1;
+      r = 0 ;
     } 
-
+    
   }
   fclose(log);
- 
+  
   return 0;
 }

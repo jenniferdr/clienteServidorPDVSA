@@ -52,7 +52,8 @@ void *atender_cliente(void *socket){
   // Recibir solicitud
   char buff[MAX_LONG];
   int recibidos;
-  if( (recibidos= recv(*mi_socket,buff,MAXLONG,0) < MAX_LONG)){
+
+  if( (recibidos= recv(*mi_socket,buff,MAX_LONG,0) < MAX_LONG)){
     perror("Error al recibir el mensaje");
     // No se si hay que avisar al hijo 
   }
@@ -76,6 +77,7 @@ void *atender_cliente(void *socket){
     }
     pthread_mutex_unlock(&mutex);
   }
+
 
   // Liberar espacio del socket
   *mi_socket=-1;
