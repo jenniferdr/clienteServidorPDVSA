@@ -71,6 +71,7 @@ void *atender_cliente(void *socket){
 	      ,tiempo_actual,buff,inventario);
     }else{
       write(*mi_socket,"noDisponible",sizeof(char)*14);
+      printf("Este centro se ha quedado sin gasolina \n");
       fprintf(log,"Suministro: %d minutos, %s, No disponible, %d litros \n"
 	      ,tiempo_actual,buff,inventario);
     }
@@ -79,7 +80,7 @@ void *atender_cliente(void *socket){
 
   // cerrar socket
   close(*mi_socket);
-  shutdown(*mi_socket,2);
+  //shutdown(*mi_socket,2);
   // Liberar espacio del socket
   *mi_socket=-1;
   pthread_exit(0);
@@ -125,8 +126,6 @@ int main(int argc, char *argv[]){
 
   //Inicio de la simulacion...
   while(tiempo_actual<480){
-    printf("Esperare que un cliente llegue \n");
-    printf("Tiempo: %d \n",tiempo_actual);
 
     int sock2;
     if((sock2=accept(sock,(struct sockaddr*)&client_addr,&sizeSockadd)) == -1){
@@ -141,6 +140,7 @@ int main(int argc, char *argv[]){
     }
     if( i==MAX_CONCURR){
        write(sock2,"noDisponible",sizeof(char)*14);
+       printf("Se alcanzó el maximo de concurrencia \n");
        close(sock2);
        shutdown(sock2,2);
        continue;       
