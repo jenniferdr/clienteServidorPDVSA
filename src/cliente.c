@@ -8,23 +8,40 @@
  *          Jennifer Dos Reis
  */
 
+// Revisar que los prints en el log estan como ellos piden 
+// Ver el problema del segmentation fault (Creo que ya lo resolvi)
+// Poner las validaciones que faltan en llamadas como read y write
 #include "funciones.h"
-int main(int argc, char *argv[]){
-  FILE *log;
-  char nombre[MAX_LONG];  // Nombre de esta Bomba
-  int capMax;             // Capacidad Máxima (Litros)
-  int inven;              // Inventario actual
-  int consumo;            // Consumo promedio (Litros*Minutos)
-  char archivo[MAX_LONG]; // Nombre de archivo "DNS"
 
-  // Datos de los servidores
-  char* nombres[MAX_SERVERS];
-  char* direcciones[MAX_SERVERS];
-  int puertos[MAX_SERVERS];
-  int tiempos[MAX_SERVERS];
+pthread_mutex_t mutex;
+int inventario;
+int consumo; // Consumo promedio (Litros*Minutos)
+FILE *log;
 
+// Hilo encargado de actualizar tiempo e inventario
+void *llevar_tiempo(void *arg_tiempo){
+  pthread_detach(pthread_self());
 
-  void swapLetras(char** a , char** b){
+  int *tiempo= (int*) arg_tiempo;
+  while(*tiempo<480){
+    
+    usleep(100000);
+    *tiempo= *tiempo +1;
+
+    pthread_mutex_lock(&mutex);
+
+    inventario = inventario-consumo;
+    if(inventario<0)inventario=0;
+    if (inventario==0){fprintf(log,"Tanque vacio: %d minutos \n", *tiempo);}
+
+    pthread_mutex_unlock(&mutex);
+
+    fflush(log);
+  }
+  pthread_exit(0);
+}
+
+void swapLetras(char** a , char** b){
    
     char * aux;
     aux = *a;
@@ -39,9 +56,21 @@ int main(int argc, char *argv[]){
     *a = *b;
     *b = aux;
   }
- 
-  argumentos_cliente(argc,argv,nombre,&inven,&consumo,&capMax,archivo);
- 
+
+
+int main(int argc, char *argv[]){
+  
+  char nombre[MAX_LONG];  // Nombre de esta Bomba
+  int capMax;             // Capacidad Máxima (Litros)
+  char archivo[MAX_LONG]; // Nombre de archivo "DNS"
+
+  // Datos de los servidores
+  char* nombres[MAX_SERVERS];
+  char* direcciones[MAX_SERVERS];
+  int puertos[MAX_SERVERS];
+  int tiempos[MAX_SERVERS];
+
+  argumentos_cliente(argc,argv,nombre,&inventario,&consumo,&capMax,archivo);
   obtener_lista_dns(archivo, nombres,direcciones,&puertos[0]);
  
   // creacion del archivo log del cliente
@@ -50,12 +79,12 @@ int main(int argc, char *argv[]){
   log = fopen(nombre_log,"w");
 
 
-  fprintf(log,"Estado inicial %d \n ", inven);
+  fprintf(log,"Estado inicial %d \n ", inventario);
   int k = 0;
  
+   // CONNECTAR CON SERVIDORES PARA PEDIR TIEMPOS
   while ((direcciones[k])!= NULL){
    
-    // CONNECT CON SERVIDORES PARA PEDIR TIEMPOS
     int sock;
     struct sockaddr_in serv_addr;
     struct hostent *he;
@@ -67,40 +96,31 @@ int main(int argc, char *argv[]){
     }
 
     if((he=gethostbyname(direcciones[k])) == NULL){
-      
       perror("Error al identificar el host");
       tiempos[k] = 500; // Para que sea ignorado de la lista de servidores
-      
       k=k+1;
       continue;
-
     }
     /*Recopilar los datos del servidor en serv_addr*/
     serv_addr.sin_family = AF_INET;
     serv_addr.sin_port = htons(puertos[k]); 
-   
     serv_addr.sin_addr = *((struct in_addr *)he->h_addr);  
     bzero(&(serv_addr.sin_zero),8);
    
     if(connect(sock,(struct sockaddr*)&serv_addr,sizeof(struct sockaddr_in))==-1){
-      printf("Error al pedir tiempos \n del servidor %s en el puerto %d",direcciones[k],puertos[k]);
-      perror("ERROR EN CONEXION");
+      printf("Error de conexion al pedir tiempos: servidor %s en el puerto %d \n"
+	     ,direcciones[k],puertos[k]);
       tiempos[k] = 500; // Para que sea ignorado de la lista de servidores
       k = k+1;
       continue;
     }
     
-    int tiempoServi;
     // FIX Validar estas llamadas 
-  
     write(sock,"Tiempo",9);
-    read(sock,&tiempoServi,sizeof(int));
+    read(sock,&tiempos[k],sizeof(int));
   
-    //   printf("Lei los datos %d \n",tiempoServi);
-    tiempos[k] = tiempoServi;
     k = k + 1;
     shutdown(sock,2);
-    //  printf("Termine iteracion %d \n",k-1);
   }
  
   // ORDENAR EL ARREGLO DE TIEMPOS y TODOS LOS DEMAS 
@@ -126,18 +146,20 @@ int main(int argc, char *argv[]){
     swap(&puertos[i],&puertos[minimo]);
     i=i+1;
   }
-   printf("posicion 2 %d %d\n", tiempos[2],puertos[2]);
+  printf("posicion 2 %d %d\n", tiempos[2],puertos[2]);
+
+  // Iniciar contador de tiempo 
+  pthread_t contador_tiempo;
+  int tiempo=0;
+  pthread_create(&contador_tiempo,NULL,llevar_tiempo,&tiempo);
  
-  // Inicio de la simulación 
+  /**** INICIO DE LA SIMULACION ****/ 
   int r = 0;
-  int tiempo = 0;
   while (tiempo <= 480){
 
-    if (inven==0){fprintf(log,"Tanque vacio: %d minutos \n", tiempo);}
-    if (inven==capMax){ fprintf(log,"Tanque Full: %d minutos\n",tiempo);}
-    fflush(log);
+    if(direcciones[k]==NULL)r=0;
 
-    if ((capMax-inven)>=38000){
+    if ((capMax-inventario)>=38000){
       int sock;
       struct sockaddr_in serv_addr;
       /*Crear el socket */
@@ -145,73 +167,58 @@ int main(int argc, char *argv[]){
 	exit(0);
  
       struct hostent *he;
-      /*Colocar aqui el nombre extraido del archivo!!!*/
       if( (he=gethostbyname(direcciones[r])) == NULL){
 	/*Pedir gasolina a otro servidor*/
 	herror("Error al identificar el host");
-	//	exit(-1);
-	/*Se pueden salvar valores para usar despues ¿?*/
-	r = r + 1;
+	r = r + 1; // FIX Y si te pasas del arreglo ? Segmentation Fault !!
 	continue;
       }
       
       /*Recopilar los datos del servidor en serv_addr*/
       serv_addr.sin_family = AF_INET;
-      // FIX
-      if (tiempos[r]==500){ r = r +1; continue;} 
+      if (tiempos[r]==500){ r = r +1; continue;} // FIX IGUAL ACA
       serv_addr.sin_port = htons(puertos[r]); 
       serv_addr.sin_addr = *((struct in_addr *)he->h_addr);  
       bzero(&(serv_addr.sin_zero),8);
       
       if(connect(sock,(struct sockaddr*)&serv_addr,sizeof(struct sockaddr_in))==-1){ 
-	perror("connect() error\n");
-	// exit(-1);
-	r = r + 1;
+	printf("Error al conectar con el servidor %s", direcciones[r]);
+	r = r + 1;  // FIX IGUAl aCa y en todos los r+1 que quedan
 	continue;
-	
       }
-
-    
-      // write(sock,nombre,sizeof(char)*14);
       
       write(sock,nombre,MAX_LONG);
+
       char gasolina[20];
       int recibidos;
-
       if( (recibidos= recv(sock,gasolina,20,0) ==- 1)){
 	perror("Error al recibir el mensaje");
-       }
-      
-      // read(sock,gasolina,sizeof(char)*14);
+	// Hay que ir al siguiente servidor ? r+1 y continue ?
+      }
 
-      printf("lo que recibo %s \n ", gasolina);
-      // poner un numero para no te puedo atender
       if (strcmp(gasolina,"noDisponible")==0){
-	fprintf(log,"Peticion: Tiempo %d, Nombre Centro %s , Nodisponible\n", tiempo, nombres[r]);
+	fprintf(log,"Peticion: %d minutos, %s , No disponible, %d litros \n",
+		tiempo, nombres[r],inventario);
 	r=r+1;
 	continue; 
 	
       } else {
-	fprintf(log,"Peticion: Tiempo %d, Nombre Centro %s ,Disponible\n", tiempo, nombres[r]);
+	fprintf(log,"Peticion: %d minutos, %s, OK, %d litros  \n",
+		tiempo, nombres[r],inventario);
 	
-	sleep(tiempos[r]); 
-	inven = inven + 38000; 
-	fprintf(log,"Llegada Gandola : tiempo %d inventario %d\n", tiempo,inven);
- 	}
-      tiempo = tiempo +1;
-      //printf("Lei los datos %s \n",gasolina);
-      //  return 0;
-      
-    } else {
-      
-      printf("tiempo es %d",tiempo);
-      
-      usleep(100000);
-      inven = inven - consumo;
-      tiempo = tiempo + 1;
-      r = 0 ;
-    } 
-    
+	usleep(tiempos[r]*100000); 
+
+	pthread_mutex_lock(&mutex);
+	inventario = inventario + 38000;
+	pthread_mutex_unlock(&mutex);
+
+	fprintf(log,"Llegada Gandola: %d minutos, %d litros \n", tiempo,inventario);
+	if (inventario==capMax){ fprintf(log,"Tanque Full: %d minutos\n",tiempo);}
+
+	// Reiniciar la busqueda de servidores activos
+	r = 0;
+      } 
+    }
   }
   fclose(log);
   

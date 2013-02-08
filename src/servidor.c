@@ -1,4 +1,3 @@
-
 /* Servidor PDVSA  
  * Simulación de un centro de distribución gasolina que 
  * se encarga de atender peticiones de las bombas de gasolina 
@@ -66,13 +65,13 @@ void *atender_cliente(void *socket){
     pthread_mutex_lock(&mutex);
     if( inventario >= 38000 ){
       inventario= inventario - 38000;
-      if(inventario==0)fprintf(log,"Tanque vacío: %d minutos",tiempo_actual);
+      if(inventario==0)fprintf(log,"Tanque vacío: %d minutos \n",tiempo_actual);
       write(*mi_socket,"enviando",sizeof(char)*9);
-      fprintf(log,"Suministro: %d minutos, %s, OK, %d litros"
+      fprintf(log,"Suministro: %d minutos, %s, OK, %d litros \n"
 	      ,tiempo_actual,buff,inventario);
     }else{
       write(*mi_socket,"noDisponible",sizeof(char)*14);
-      fprintf(log,"Suministro: %d minutos, %s, No disponible, %d litros"
+      fprintf(log,"Suministro: %d minutos, %s, No disponible, %d litros \n"
 	      ,tiempo_actual,buff,inventario);
     }
     pthread_mutex_unlock(&mutex);
@@ -82,6 +81,7 @@ void *atender_cliente(void *socket){
   // Liberar espacio del socket
   *mi_socket=-1;
   // cerrar socket
+  close(*mi_socket);
   shutdown(*mi_socket,2);
   pthread_exit(0);
 
@@ -140,7 +140,12 @@ int main(int argc, char *argv[]){
     for(i=0; i<MAX_CONCURR;i++){
       if(sockets[i]==-1)break;
     }
-    // if i==MAX_CONCURR then no hay espacio decirle al cliente q no se puede atender
+    if( i==MAX_CONCURR){
+       write(sock2,"noDisponible",sizeof(char)*14);
+       close(sock2);
+       shutdown(sock2,2);
+       continue;       
+    }
     sockets[i]= sock2;
 
     pthread_t trabajador;
