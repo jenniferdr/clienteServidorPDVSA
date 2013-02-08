@@ -155,6 +155,8 @@ int main(int argc, char *argv[]){
   }
 
   fclose(log);
+  close(sock);
+  close(sock2);
   return 0;
 
 
