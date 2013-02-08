@@ -120,7 +120,8 @@ int main(int argc, char *argv[]){
     read(sock,&tiempos[k],sizeof(int));
   
     k = k + 1;
-    shutdown(sock,2);
+    close(sock);
+    //shutdown(sock,2);
   }
  
   // ORDENAR EL ARREGLO DE TIEMPOS y TODOS LOS DEMAS 
@@ -157,7 +158,7 @@ int main(int argc, char *argv[]){
   int r = 0;
   while (tiempo <= 480){
 
-    if(direcciones[k]==NULL)r=0;
+    if(direcciones[r]==NULL)r=0;
 
     if ((capMax-inventario)>=38000){
       int sock;
@@ -218,6 +219,7 @@ int main(int argc, char *argv[]){
 	// Reiniciar la busqueda de servidores activos
 	r = 0;
       } 
+      close(sock);
     }
   }
   fclose(log);
