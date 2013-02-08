@@ -173,7 +173,7 @@ int main(int argc, char *argv[]){
 	/*Pedir gasolina a otro servidor*/
 	herror("Error al identificar el host");
 	if (direcciones[r] == NULL){
-	  tiempo= 0;
+	  r= 0;
 	}
 	else {
 	  r = r + 1; // FIX Y si te pasas del arreglo ? Segmentation Fault !!
@@ -191,7 +191,7 @@ int main(int argc, char *argv[]){
       if(connect(sock,(struct sockaddr*)&serv_addr,sizeof(struct sockaddr_in))==-1){ 
 	printf("Error al conectar con el servidor %s", direcciones[r]);
 	if (direcciones[r] == NULL){
-	  tiempo= 0;
+	  r=0;
 	}
 	else {
 	  r = r + 1; // FIX Y si te pasas del arreglo ? Segmentation Fault !!
@@ -212,7 +212,7 @@ int main(int argc, char *argv[]){
 	fprintf(log,"Peticion: %d minutos, %s , No disponible, %d litros \n",
 		tiempo, nombres[r],inventario);
 	if (direcciones[r] == NULL){
-	  tiempo= 0;
+	  r= 0;
 	}
 	else {
 	  r = r + 1; // FIX Y si te pasas del arreglo ? Segmentation Fault !!
