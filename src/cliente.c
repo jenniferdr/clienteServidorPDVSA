@@ -12,6 +12,7 @@
 // Ver el problema del segmentation fault (Creo que ya lo resolvi)
 // Poner las validaciones que faltan en llamadas como read y write
 #include "funciones.h"
+#include <pthread.h>
 
 pthread_mutex_t mutex;
 int inventario;
@@ -94,7 +95,7 @@ int main(int argc, char *argv[]){
       perror("Error al crear el socket");
       exit(-1);
     }
-
+    printf("direcciones %s",direcciones[k]);
     if((he=gethostbyname(direcciones[k])) == NULL){
       perror("Error al identificar el host");
       tiempos[k] = 500; // Para que sea ignorado de la lista de servidores
@@ -171,8 +172,13 @@ int main(int argc, char *argv[]){
       if( (he=gethostbyname(direcciones[r])) == NULL){
 	/*Pedir gasolina a otro servidor*/
 	herror("Error al identificar el host");
-	r = r + 1; // FIX Y si te pasas del arreglo ? Segmentation Fault !!
-	continue;
+	if (direcciones[r] == NULL){
+	  tiempo= 0;
+	}
+	else {
+	  r = r + 1; // FIX Y si te pasas del arreglo ? Segmentation Fault !!
+	  continue;
+	}
       }
       
       /*Recopilar los datos del servidor en serv_addr*/
@@ -184,12 +190,17 @@ int main(int argc, char *argv[]){
       
       if(connect(sock,(struct sockaddr*)&serv_addr,sizeof(struct sockaddr_in))==-1){ 
 	printf("Error al conectar con el servidor %s", direcciones[r]);
-	r = r + 1;  // FIX IGUAl aCa y en todos los r+1 que quedan
-	continue;
+	if (direcciones[r] == NULL){
+	  tiempo= 0;
+	}
+	else {
+	  r = r + 1; // FIX Y si te pasas del arreglo ? Segmentation Fault !!
+	  continue;
+	}
       }
       
       write(sock,nombre,MAX_LONG);
-
+      
       char gasolina[20];
       int recibidos;
       if( (recibidos= recv(sock,gasolina,20,0) ==- 1)){
@@ -200,9 +211,13 @@ int main(int argc, char *argv[]){
       if (strcmp(gasolina,"noDisponible")==0){
 	fprintf(log,"Peticion: %d minutos, %s , No disponible, %d litros \n",
 		tiempo, nombres[r],inventario);
-	r=r+1;
-	continue; 
-	
+	if (direcciones[r] == NULL){
+	  tiempo= 0;
+	}
+	else {
+	  r = r + 1; // FIX Y si te pasas del arreglo ? Segmentation Fault !!
+	  continue;
+	}
       } else {
 	fprintf(log,"Peticion: %d minutos, %s, OK, %d litros  \n",
 		tiempo, nombres[r],inventario);
