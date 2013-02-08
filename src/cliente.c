@@ -172,13 +172,8 @@ int main(int argc, char *argv[]){
       if( (he=gethostbyname(direcciones[r])) == NULL){
 	/*Pedir gasolina a otro servidor*/
 	herror("Error al identificar el host");
-	if (direcciones[r] == NULL){
-	  r= 0;
-	}
-	else {
-	  r = r + 1; // FIX Y si te pasas del arreglo ? Segmentation Fault !!
+	  r = r + 1;
 	  continue;
-	}
       }
       
       /*Recopilar los datos del servidor en serv_addr*/
@@ -190,13 +185,8 @@ int main(int argc, char *argv[]){
       
       if(connect(sock,(struct sockaddr*)&serv_addr,sizeof(struct sockaddr_in))==-1){ 
 	printf("Error al conectar con el servidor %s", direcciones[r]);
-	if (direcciones[r] == NULL){
-	  r=0;
-	}
-	else {
-	  r = r + 1; // FIX Y si te pasas del arreglo ? Segmentation Fault !!
+	  r = r + 1; 
 	  continue;
-	}
       }
       
       write(sock,nombre,MAX_LONG);
@@ -211,13 +201,8 @@ int main(int argc, char *argv[]){
       if (strcmp(gasolina,"noDisponible")==0){
 	fprintf(log,"Peticion: %d minutos, %s , No disponible, %d litros \n",
 		tiempo, nombres[r],inventario);
-	if (direcciones[r] == NULL){
-	  r= 0;
-	}
-	else {
-	  r = r + 1; // FIX Y si te pasas del arreglo ? Segmentation Fault !!
+	  r = r + 1; 
 	  continue;
-	}
       } else {
 	fprintf(log,"Peticion: %d minutos, %s, OK, %d litros  \n",
 		tiempo, nombres[r],inventario);
