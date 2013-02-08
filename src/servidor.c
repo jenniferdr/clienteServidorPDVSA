@@ -77,12 +77,11 @@ void *atender_cliente(void *socket){
     pthread_mutex_unlock(&mutex);
   }
 
-
-  // Liberar espacio del socket
-  *mi_socket=-1;
   // cerrar socket
   close(*mi_socket);
   shutdown(*mi_socket,2);
+  // Liberar espacio del socket
+  *mi_socket=-1;
   pthread_exit(0);
 
 }
