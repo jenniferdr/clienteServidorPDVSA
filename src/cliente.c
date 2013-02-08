@@ -107,7 +107,7 @@ int main(int argc, char *argv[]){
   int i = 0 ;
   int minimo;
   int j;
-  // printf("Hola voy a ordenar \n");
+  printf("Hola voy a ordenar \n");
 
   while (nombres[i]!=NULL){
    
@@ -126,7 +126,7 @@ int main(int argc, char *argv[]){
     swap(&puertos[i],&puertos[minimo]);
     i=i+1;
   }
-
+   printf("posicion 2 %d %d\n", tiempos[2],puertos[2]);
  
   // Inicio de la simulación 
   int r = 0;
@@ -170,20 +170,20 @@ int main(int argc, char *argv[]){
 	continue;
 	
       }
-<
-      char* gasolina;
-      write(sock,nombre,sizeof(char)*9);
+
+    
+      // write(sock,nombre,sizeof(char)*14);
       
       write(sock,nombre,MAX_LONG);
-      char gasolina[14];
+      char gasolina[20];
       int recibidos;
-      if( (recibidos= recv(sock,gasolina,14,0) < 14)){
+      if( (recibidos= recv(sock,gasolina,20,0) < 20)){
 	perror("Error al recibir el mensaje");
-      }
+       }
      
       
       // read(sock,gasolina,sizeof(char)*14);
-      printf("loque recibo%s", gasolina);
+      printf("lo que recibo%s  ", gasolina);
       // poner un numero para no te puedo atender
       if (gasolina == "noDisponible"){
 	fprintf(log,"Peticion: Tiempo %d, Nombre Centro %s , Nodisponible\n", tiempo, nombres[r]);
@@ -198,6 +198,7 @@ int main(int argc, char *argv[]){
 	inven = inven + 38000; 
 	fprintf(log,"Llegada Gandola : tiempo %d inventario %d\n", tiempo,inven);
  	}
+      tiempo = tiempo +1;
       //printf("Lei los datos %s \n",gasolina);
       //  return 0;
       

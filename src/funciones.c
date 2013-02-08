@@ -264,10 +264,10 @@ int obtener_lista_dns(char *filename,char ** nombre,
     }
    
     free(t);
-    puertos[i-1]=0;
-    direcciones[i-1]= NULL;
+    puertos[i]=0;
+    direcciones[i]= NULL;
     printf("Posicion del arreglo %d \n",i);
-    nombre[i-1]=NULL;
+    nombre[i]=NULL;
     fclose ( file );
  
   }else{
