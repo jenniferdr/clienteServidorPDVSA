@@ -53,7 +53,7 @@ void *atender_cliente(void *socket){
   char buff[MAX_LONG];
   int recibidos;
 
-  if( (recibidos= recv(*mi_socket,buff,MAX_LONG,0) < MAX_LONG)){
+  if( (recibidos= recv(*mi_socket,buff,MAX_LONG,0)== -1)){
     perror("Error al recibir el mensaje");
     // No se si hay que avisar al hijo 
   }
