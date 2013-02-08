@@ -1,5 +1,5 @@
 all:  src/funciones.o src/cliente.o src/servidor.o
-	gcc src/funciones.o src/cliente.o -o bomba
+	gcc src/funciones.o src/cliente.o -pthread -o bomba
 	gcc src/funciones.o src/servidor.o -pthread -o centro
 cliente.o: src/cliente.c src/funciones.h 
 	gcc -c src/cliente.c -o src/cliente.o
