@@ -177,15 +177,18 @@ int main(int argc, char *argv[]){
       write(sock,nombre,MAX_LONG);
       char gasolina[20];
       int recibidos;
-      if( (recibidos= recv(sock,gasolina,20,0) < 20)){
+      if( (recibidos = recv(sock,gasolina,20,0) == -1)){
 	perror("Error al recibir el mensaje");
        }
      
       
       // read(sock,gasolina,sizeof(char)*14);
-      printf("lo que recibo%s  ", gasolina);
+      printf("lo que recibo  %s  ", gasolina);
+
       // poner un numero para no te puedo atender
-      if (gasolina == "noDisponible"){
+      int res = strncmp(gasolina, "noDisponible", 20);
+      if (res == 0){
+	
 	fprintf(log,"Peticion: Tiempo %d, Nombre Centro %s , Nodisponible\n", tiempo, nombres[r]);
 	r=r+1;
 	continue; 
