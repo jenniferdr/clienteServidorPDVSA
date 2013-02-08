@@ -236,8 +236,11 @@ int obtener_lista_dns(char *filename,char ** nombre,
 
   if ( file != NULL ){
     
-    char linea [ 128 ]; 
+    char linea [ MAX_LONG*2 ]; 
     while ( fgets ( linea, sizeof linea, file ) != NULL ){
+      // Ignorar lineas en blanco
+      if(strcmp(linea,"\n")==0)continue;
+
       t=strtok(linea,"&\n");
       //    printf("token %s",t);
       int j=0;
@@ -264,9 +267,9 @@ int obtener_lista_dns(char *filename,char ** nombre,
     }
    
     free(t);
-    puertos[i-1]=0;
-    direcciones[i-1]= NULL;
-    nombre[i-1]=NULL;
+    puertos[i]=0;
+    direcciones[i]= NULL;
+    nombre[i]=NULL;
     fclose ( file );
  
   }else{
