@@ -177,11 +177,13 @@ int main(int argc, char *argv[]){
       write(sock,nombre,MAX_LONG);
       char gasolina[20];
       int recibidos;
+
       if( (recibidos= recv(sock,gasolina,20,0) ==- 1)){
 	perror("Error al recibir el mensaje");
        }
       
       // read(sock,gasolina,sizeof(char)*14);
+
       printf("lo que recibo %s \n ", gasolina);
       // poner un numero para no te puedo atender
       if (strcmp(gasolina,"noDisponible")==0){
@@ -190,7 +192,6 @@ int main(int argc, char *argv[]){
 	continue; 
 	
       } else {
-	  // ver si el tiempo de dormir es de verdad ese
 	fprintf(log,"Peticion: Tiempo %d, Nombre Centro %s ,Disponible\n", tiempo, nombres[r]);
 	
 	sleep(tiempos[r]); 
