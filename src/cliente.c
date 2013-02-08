@@ -132,10 +132,9 @@ int main(int argc, char *argv[]){
   int r = 0;
   int tiempo = 0;
   while (tiempo <= 480){
-    // Si se puede recibir una gandola
-    if (inven==0){fprintf(log,"tanque vacio en el tiempo : %d\n", tiempo);}
 
-    if (inven==capMax){ fprintf(log,"Tanque Full %d\n",tiempo);}
+    if (inven==0){fprintf(log,"Tanque vacio: %d minutos \n", tiempo);}
+    if (inven==capMax){ fprintf(log,"Tanque Full: %d minutos\n",tiempo);}
     fflush(log);
 
     if ((capMax-inven)>=38000){
@@ -159,7 +158,7 @@ int main(int argc, char *argv[]){
       /*Recopilar los datos del servidor en serv_addr*/
       serv_addr.sin_family = AF_INET;
       // FIX
-      if (puertos[r]==500){ r = r +1; continue;} 
+      if (tiempos[r]==500){ r = r +1; continue;} 
       serv_addr.sin_port = htons(puertos[r]); 
       serv_addr.sin_addr = *((struct in_addr *)he->h_addr);  
       bzero(&(serv_addr.sin_zero),8);
@@ -172,7 +171,7 @@ int main(int argc, char *argv[]){
 	
       }
       char* gasolina;
-      write(sock,nombre,9);
+      write(sock,nombre,sizeof(char)*9);
       
 	read(sock,gasolina,sizeof(char)*14);
 	printf("loque recibo%s", gasolina);
