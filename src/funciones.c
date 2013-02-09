@@ -54,7 +54,7 @@ void obtener_socket_servidor(int puerto,int *sock){
   serv_addr.sin_port = htons(puerto);
   serv_addr.sin_addr.s_addr = INADDR_ANY;
   bzero(&(serv_addr.sin_zero), 8);
-
+  
   int sizeSockadd = sizeof(struct sockaddr_in);
 
   if(bind(*sock,(struct sockaddr*) &serv_addr,sizeSockadd)==-1){
@@ -90,11 +90,10 @@ void argumentos_cliente (int numArg,char ** arreglo, char* nombr, int *inve,
       if(!strcmp(arreglo[i*2 + 1],"-c")) { 
 
 	*consu= atoi(arreglo[i*2+2]);
-	if (0 <= *consu && *consu <= 1000){
-
-	}else{ 
-	  perror("El numero del consumo debe estar en [0 - 1000]\n");
+	if (0 > *consu || *consu > 1000){
+  	  perror("El numero del consumo debe estar en [0 - 1000]\n");
 	  exit(-1);
+
 	}
 
       }else if(!strcmp(arreglo[i*2 + 1],"-n")) {
@@ -105,14 +104,11 @@ void argumentos_cliente (int numArg,char ** arreglo, char* nombr, int *inve,
       }else if(!strcmp(arreglo[i*2 + 1],"-i")) { 
 	
 	*inve= atoi(arreglo[i*2+2]); 
-	if (0 <= *inve && *inve <= *camax){
-
-	}else{
-	  perror("ERROR: El numero del Inventario no corresponde\n  Debe estar en [0 - capacidadMaxima]");
+	if (0 > *inve || *inve > *camax){
+	   perror("ERROR: El numero del Inventario no corresponde\n  Debe estar en [0 - capacidadMaxima]");
 
 	  exit(-1);
 	}
-       
       }else if(!strcmp(arreglo[i*2 + 1],"-fc")) { 
 	strcpy(archi,arreglo[i*2+2]);
 
@@ -127,13 +123,10 @@ void argumentos_cliente (int numArg,char ** arreglo, char* nombr, int *inve,
 	exit(-1);
       } 
     }
-    if (38000 <= *camax && *camax <= 380000){
-
-    }else{ 
+    if (38000 > *camax || *camax > 380000){
       perror("El Numero de Capacidad Maxima \n Debe estar en [38000 - 3800000]\n"); 
       exit(-1);
-    }
-    
+    }  
   }
 }
 
@@ -182,35 +175,29 @@ void obtener_argumentos_servidor (int num,char ** arreglo, char* nombr, int *inv
 	  break;
 	case'i':
 	  *inve = atoi(optarg); 
-	   
-	  if (0 <= *inve && *inve <= *camax){
-
-	  }else{
+	  
+	  if (0 > *inve || *inve > *camax){
 	    perror("ERROR: El numero del Inventario no corresponde\n  Debe estar en [0 - capacidadMaxima]");
-
+	    exit(-1);
 	  }
 	  break;
 	case't':
 	  *tiem = atoi(optarg); 
-	  if (0 <=  *tiem && *tiem <= 180){
-	  }else{ 
+	  if (0 >  *tiem || *tiem > 180){
 	    perror("ERROR: El numero del Tiempo no corresponde  \n Debe estar en [0 - 180]");
-	    exit(-1);  
+	    exit(-1);
 	  }
 	  break;
 	case's':
 	  *sum = atoi(optarg); 
-	  if (0 <=  *sum && *sum <= 10000){
-
-	  }else{ 
-	    perror("ERROR: , El numero del suministro no es valido \n DEbe estar en [0 - 10000]");
+	  if (0 >  *sum || *sum > 10000){
+	     perror("ERROR: , El numero del suministro no es valido \n DEbe estar en [0 - 10000]");
 	    exit(-1);
-	   
 	  }
 	  break;
 	case'p':
 	  *puert = atoi(optarg); 
-	  if (puert<=0){
+	  if (*puert<=0){
 	    perror("ERROR: El puerto debe ser un numero positivo");
 	    exit(-1);
 	  }
