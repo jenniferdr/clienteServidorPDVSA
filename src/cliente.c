@@ -69,19 +69,19 @@ int main(int argc, char *argv[]){
  
    // CONNECTAR CON SERVIDORES PARA PEDIR TIEMPOS
   while ((direcciones[k])!= NULL){
-   
+    
     int sock;
     struct sockaddr_in serv_addr;
     struct hostent *he;
     
     /*Crear el socket */
     if((sock= socket(AF_INET,SOCK_STREAM,0))==-1){
-      perror("Error al crear el socket");
+      perror("Error al crear el socket /n");
       exit(-1);
     }
   
     if((he=gethostbyname(direcciones[k])) == NULL){
-      perror("Error al identificar el host");
+      perror("Error al identificar el host/n");
       tiempos[k] = 500; // Para que sea ignorado de la lista de servidores
       k=k+1;
       continue;
@@ -100,13 +100,13 @@ int main(int argc, char *argv[]){
       continue;
     }
     
-    // FIX Validar estas llamadas 
+   
     write(sock,"Tiempo",9);
     read(sock,&tiempos[k],sizeof(int));
   
     k = k + 1;
     close(sock);
-    //shutdown(sock,2);
+   
   }
  
   // ORDENAR EL ARREGLO DE TIEMPOS y TODOS LOS DEMAS 
@@ -141,8 +141,9 @@ int main(int argc, char *argv[]){
  
   /**** INICIO DE LA SIMULACION ****/ 
   int r = 0;
+ 
   while (tiempo <= 480){
-
+   
     if(direcciones[r]==NULL)r=0;
 
     if ((capMax-inventario)>=38000){
@@ -156,7 +157,7 @@ int main(int argc, char *argv[]){
       struct hostent *he;
       if( (he=gethostbyname(direcciones[r])) == NULL){
 	/*Pedir gasolina a otro servidor*/
-	perror("Error al identificar el host");
+	perror("Error al identificar el host /n");
 	r = r + 1;
 	continue;
       }
@@ -179,7 +180,7 @@ int main(int argc, char *argv[]){
       char gasolina[20];
       int recibidos;
       if( (recibidos= recv(sock,gasolina,20,0) ==- 1)){
-	perror("Error al recibir el mensaje");
+	perror("Error al recibir el mensaje\n");
 	// Hay que ir al siguiente servidor ? r+1 y continue ?
       }
 

@@ -56,7 +56,7 @@ void *atender_cliente(void *socket){
   int recibidos;
 
   if( (recibidos= recv(*mi_socket,buff,MAX_LONG,0)== -1)){
-    perror("Error al recibir el mensaje");
+    perror("Error al recibir el mensaje\n");
     close(*mi_socket);
     *mi_socket=-1;
     pthread_exit(0);
@@ -129,15 +129,16 @@ int main(int argc, char *argv[]){
   pthread_create(&contador_tiempo,NULL,llevar_tiempo,&tiempo_actual);
 
   //Inicio de la simulacion...
+ 
   while(tiempo_actual<480){
-
+   
     int sock2;
     if((sock2=accept(sock,(struct sockaddr*)&client_addr,&sizeSockadd)) == -1){
       if(errno==EAGAIN || errno==EWOULDBLOCK){
 	usleep(1000);
 	continue;
       }
-      perror("Error al aceptar conexion con el cliente");
+      perror("Error al aceptar conexion con el cliente/n");
       continue;
     }
     
