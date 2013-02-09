@@ -24,17 +24,18 @@ void *llevar_tiempo(void *arg_tiempo){
   pthread_detach(pthread_self());
 
   int *tiempo= (int*) arg_tiempo;
-  while(*tiempo<480){
+  while(*tiempo<=480){
     
     usleep(100000);
     *tiempo= *tiempo +1;
 
     pthread_mutex_lock(&mutex);
 
-    inventario = inventario-consumo;
-    if(inventario<0)inventario=0;
-    if (inventario==0){fprintf(log,"Tanque vacio: %d minutos \n", *tiempo);}
-
+    if(inventario!=0){
+      inventario = inventario-consumo;
+      if(inventario<0)inventario=0;
+      if (inventario==0){fprintf(log,"Tanque vacio: %d minutos \n", *tiempo);}
+    }
     pthread_mutex_unlock(&mutex);
 
     fflush(log);
@@ -64,7 +65,9 @@ int main(int argc, char *argv[]){
   log = fopen(nombre_log,"w");
 
 
-  fprintf(log,"Estado inicial %d \n ", inventario);
+  fprintf(log,"Inventario inicial %d \n ", inventario);
+  if(inventario==0) fprintf(log,"Tanque vacio: 0 minutos \n");
+  if(inventario==capMax) fprintf(log,"Tanque full: 0 minutos \n");
   int k = 0;
  
    // CONNECTAR CON SERVIDORES PARA PEDIR TIEMPOS
@@ -155,7 +158,7 @@ int main(int argc, char *argv[]){
       struct hostent *he;
       if( (he=gethostbyname(direcciones[r])) == NULL){
 	/*Pedir gasolina a otro servidor*/
-	herror("Error al identificar el host");
+	perror("Error al identificar el host");
 	  r = r + 1;
 	  continue;
       }

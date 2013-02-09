@@ -48,7 +48,7 @@ void obtener_socket_servidor(int puerto,int *sock){
     perror("Error al inicializar el socket");
     exit(-1);
   }
-
+  fcntl(*sock,F_SETFL, O_NONBLOCK);
   struct sockaddr_in serv_addr;
 
   /*Asignar dirección del servidor en serv_addr para hacer el bind() */
