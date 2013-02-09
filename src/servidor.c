@@ -80,7 +80,6 @@ void *atender_cliente(void *socket){
 
   // cerrar socket
   close(*mi_socket);
-  //shutdown(*mi_socket,2);
   // Liberar espacio del socket
   *mi_socket=-1;
   pthread_exit(0);
@@ -129,6 +128,10 @@ int main(int argc, char *argv[]){
 
     int sock2;
     if((sock2=accept(sock,(struct sockaddr*)&client_addr,&sizeSockadd)) == -1){
+      if(errno==EAGAIN || errno==EWOULDBLOCK){
+	usleep(1000);
+	continue;
+      }
       perror("Error al aceptar conexion con el cliente");
       continue;
     }
@@ -142,7 +145,6 @@ int main(int argc, char *argv[]){
        write(sock2,"noDisponible",sizeof(char)*14);
        printf("Se alcanzó el maximo de concurrencia \n");
        close(sock2);
-       shutdown(sock2,2);
        continue;       
     }
     sockets[i]= sock2;
