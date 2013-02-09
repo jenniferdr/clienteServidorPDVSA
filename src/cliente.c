@@ -181,7 +181,8 @@ int main(int argc, char *argv[]){
       int recibidos;
       if( (recibidos= recv(sock,gasolina,20,0) ==- 1)){
 	perror("Error al recibir el mensaje\n");
-	// Hay que ir al siguiente servidor ? r+1 y continue ?
+	r = r + 1;
+	continue;
       }
 
       if (strcmp(gasolina,"noDisponible")==0){
