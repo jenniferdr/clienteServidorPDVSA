@@ -20,18 +20,46 @@
 #define MAX_SERVERS 50
 #define MAX_CONCURR 128
 
-/*Comentar lo que hace cada funcion*/
 
-// Obtener argumentos..
-extern void argumentos_cliente (int num, char ** arreglo, char *nombr
-				,int* inve, int *consu, int* camax,  char* archi);
+/*
+ * Muestra por pantalla la sintaxis correcta para 
+ * llamar al programa cliente (Bomba).
+ */
+void opciones_cliente();
+
+/*
+ * Muestra por pantalla la sintaxis correcta para 
+ * llamar al programa servidor (Centro).
+ */
+void opciones_servidor();
+
+/*
+ * Crea un socket TCP no bloqueante, configura el bind() y listen()
+ * Toma como argumento el puerto en el que se desea asociar el socket y
+ * un apuntador a entero.
+ * El descriptor del socket será guardado en la dirección de memoria
+ * apuntada por la variable sock.
+ */
+void obtener_socket_servidor(int puerto,int *sock);
+
+/*  Realiza la validacion de los argumentos del cliente*/
+/* Que esten completos y que la informacion sea correcta */
+void argumentos_cliente (int numArg,char ** arreglo, char* nombr, int *inve,
+			 int *consu, int *camax, char* archi);
+
+/* Validar y obtener los argumentos del servidor */
+void obtener_argumentos_servidor (int num,char ** arreglo, char* nombr, int *inve,
+				  int *tiem, int *sum,int *puert, int *camax);
+
+/* Lee del archivo DNS la informacion correspondiente*/
+/* en los arreglos repectivos*/
+int obtener_lista_dns(char *filename,char ** nombre, 
+		      char **direcciones, int *puertos );
+
+/* Funcion Auxiliar que intercambia dos string*/
+void swapLetras(char** a , char** b);
+
+/* funcion auxiliar que intercambia dos enteros*/
+void swap(int *a , int *b);
 
 
-extern void argumentos_servidor (int num,char ** arreglo, char* nombr,int *inve,
-				 int *tiem, int *sum,int *puert, int *camax);
-
-// Imprimir por pantalla el uso correcto del comando
-extern void opciones();
-
-
-extern obtener_lista_dns(char filename[], char ** nombre, char **direcciones, int *puertos );

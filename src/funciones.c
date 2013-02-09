@@ -15,7 +15,7 @@ void opciones_cliente(){
   printf("-i <Numero del Inventario> \n");
   printf("-fc <Nombre del Archivo Central > \n");
   printf("-c <Numero de Consumo Promedio> \n");
-  printf("-cp <Numero Capacida Maxima> \n");
+  printf("-cp <Numero Capacidad Maxima> \n");
 }
 
 /*
@@ -28,12 +28,12 @@ void opciones_servidor(){
   printf("-i <Numero del Inventario> \n");
   printf("-s <Cantidad De Suministro > \n");
   printf("-t <Tiempo> \n");
-  printf("-cp <Numero Capacida Maxima> \n");
+  printf("-cp <Numero Capacidad Maxima> \n");
   printf(" -p  <Puerto>");
 }
 
 /*
- * Crea un socket TCP, configura el bind() y listen()
+ * Crea un socket TCP no bloqueante, configura el bind() y listen()
  * Toma como argumento el puerto en el que se desea asociar el socket y
  * un apuntador a entero.
  * El descriptor del socket será guardado en la dirección de memoria
@@ -72,7 +72,8 @@ void obtener_socket_servidor(int puerto,int *sock){
 
 /*  Realiza la validacion de los argumentos del cliente*/
 /* Que esten completos y que la informacion sea correcta */
-void argumentos_cliente (int numArg,char ** arreglo, char* nombr, int *inve, int *consu, int *camax, char* archi){
+void argumentos_cliente (int numArg,char ** arreglo, char* nombr, int *inve,
+			 int *consu, int *camax, char* archi){
   int op;
 
   if (numArg !=11){
@@ -93,7 +94,6 @@ void argumentos_cliente (int numArg,char ** arreglo, char* nombr, int *inve, int
 	  // printf("El consumo es %d \n", *consu);
 	}else{ 
 	  perror("El numero del consumo debe estar en [0 - 1000]\n");
-
 	  exit(-1);
 	}
 
@@ -130,22 +130,23 @@ void argumentos_cliente (int numArg,char ** arreglo, char* nombr, int *inve, int
     if (38000 <= *camax && *camax <= 380000){
       // printf("La Capacidad maxima es: %d \n", *camax);
     }else{ 
-      perror("El Numero de Capacidad Maxima \n Debe estar en [38000 - 3800000]\n");
-     
+      perror("El Numero de Capacidad Maxima \n Debe estar en [38000 - 3800000]\n"); 
       exit(-1);
     }
     
   }
 }
-/* Validar y obtener los argumentos del servidor */
 
-void obtener_argumentos_servidor (int num,char ** arreglo, char* nombr, int *inve, int *tiem, int *sum,int *puert, int *camax){
+/* Validar y obtener los argumentos del servidor */
+void obtener_argumentos_servidor (int num,char ** arreglo, char* nombr, int *inve,
+				  int *tiem, int *sum,int *puert, int *camax){
 
   int op;
   bool cp = false;
   if (num !=13){
     perror( "Sintaxis Incorrecta");
     opciones_servidor(); 
+    exit(-1);
   }else{
     int i; 
     for(i = 0 ; i < 6 ; i++){ 
@@ -192,7 +193,7 @@ void obtener_argumentos_servidor (int num,char ** arreglo, char* nombr, int *inv
 	case't':
 	  *tiem = atoi(optarg); 
 	  if (0 <=  *tiem && *tiem <= 180){
-	    printf("tiempo es: %d \n",*tiem );
+	    //printf("tiempo es: %d \n",*tiem );
 	  }else{ 
 	    perror("ERROR: El numero del Tiempo no corresponde  \n Debe estar en [0 - 180]");
 	    exit(-1);  
@@ -210,15 +211,17 @@ void obtener_argumentos_servidor (int num,char ** arreglo, char* nombr, int *inv
 	  break;
 	case'p':
 	  *puert = atoi(optarg); 
-	  // Validar que el puerto este en un rango valido 
-	  // printf("mi puerto es: %d \n", *puert);
+	  if (puert<=0){
+	    perror("ERROR: El puerto debe ser un numero positivo");
+	    exit(-1);
+	  }
 	  break;
 	case 'c':
 	  break;
 	case '?':
 	  perror("Error: Opcion Desconocida\n");
 	  opciones_servidor();
-	 
+	  exit(-1);
 	  break;
 	} 
     } 
@@ -260,8 +263,8 @@ int obtener_lista_dns(char *filename,char ** nombre,
 	  
 	  nombre[i]= (char*) malloc(sizeof(char)*128); 
 	  while(nombre[i] == 0){
-	    printf("Memoria no reservada, esperare un segundo");
-	    sleep(1);
+	    printf("Memoria no reservada, esperare un segundo\n");
+	    usleep(100000);
 	    nombre[i]= (char*) malloc(sizeof(char)*128); 
 	  }
 	  
@@ -272,8 +275,8 @@ int obtener_lista_dns(char *filename,char ** nombre,
 	  
 	  direcciones[i]= (char*) malloc(sizeof(char)*128);
 	  while(direcciones[i] == 0){
-	    printf("Memoria no reservada, esperare un segundo");
-	    sleep(1);
+	    printf("Memoria no reservada, esperare un segundo\n");
+	    usleep(100000);
 	    direcciones[i]= (char*) malloc(sizeof(char)*128); 
 	    
 	  }
