@@ -101,7 +101,7 @@ int main(int argc, char *argv[]){
   sprintf(nombre_log,"log_%s.txt",nombre_centro);
   log = fopen(nombre_log,"w");
 
-  fprintf(log,"Estado inicial: %d \n",inventario);
+  fprintf(log,"Inventario inicial: %d litros \n",inventario);
   if(inventario==0) fprintf(log,"Tanque vacio: 0 minutos \n");
   if(inventario==capMax) fprintf(log,"Tanque full: 0 minutos \n");
   fflush(log);
@@ -152,6 +152,8 @@ int main(int argc, char *argv[]){
    
     fflush(log);
   }
+
+  usleep(100000);
 
   fclose(log);
   return 0;
