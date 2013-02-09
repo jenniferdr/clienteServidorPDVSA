@@ -83,6 +83,7 @@ int main(int argc, char *argv[]){
     if((he=gethostbyname(direcciones[k])) == NULL){
       perror("Error al identificar el host/n");
       tiempos[k] = 500; // Para que sea ignorado de la lista de servidores
+      close(sock);
       k=k+1;
       continue;
     }
@@ -96,6 +97,7 @@ int main(int argc, char *argv[]){
       printf("Error de conexion al pedir tiempos: servidor %s en el puerto %d \n"
 	     ,direcciones[k],puertos[k]);
       tiempos[k] = 500; // Para que sea ignorado de la lista de servidores
+      close(sock);
       k = k+1;
       continue;
     }
@@ -152,7 +154,6 @@ int main(int argc, char *argv[]){
       /*Crear el socket */
       if((sock= socket(AF_INET,SOCK_STREAM,0))==-1){
 	perror("Error al crear el socket cliente \n");
-	close(sock);
 	continue;
       }
       struct hostent *he;
