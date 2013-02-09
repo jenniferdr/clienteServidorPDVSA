@@ -18,7 +18,7 @@ FILE *log;
 pthread_mutex_t mutex; // mutex sobre el inventario
 int tiempo_respuesta;
 
-// Hilo encargado de actualizar tiempo e inventario
+// Hilo encargad de actualizar tiempo e inventario
 void *llevar_tiempo(void *arg_tiempo){
   pthread_detach(pthread_self());
 
@@ -71,7 +71,7 @@ void *atender_cliente(void *socket){
 	      ,tiempo_actual,buff,inventario);
     }else{
       write(*mi_socket,"noDisponible",sizeof(char)*14);
-      printf("Este centro se ha quedado sin gasolina \n");
+      printf("Centro con inventario insuficiente \n");
       fprintf(log,"Suministro: %d minutos, %s, No disponible, %d litros \n"
 	      ,tiempo_actual,buff,inventario);
     }

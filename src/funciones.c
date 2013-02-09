@@ -3,9 +3,7 @@
  */
 
 #include "funciones.h"
-
-// Falta Documentar y quitar prints y validar cosas
-// Que un argumento depende de otro 
+ 
 
 /*
  * Muestra por pantalla la sintaxis correcta para 
@@ -42,7 +40,7 @@ void opciones_servidor(){
  * apuntada por la variable sock.
  */
 void obtener_socket_servidor(int puerto,int *sock){
-
+  
   /*Crear el socket */
   if((*sock= socket(AF_INET,SOCK_STREAM,0))==-1){
     perror("Error al inicializar el socket");
@@ -90,9 +88,9 @@ void argumentos_cliente (int numArg,char ** arreglo, char* nombr, int *inve, int
 
       if(!strcmp(arreglo[i*2 + 1],"-c")) { 
 
-	*consu= atoi(arreglo[i*2+2]); // FIX Validar !!
+	*consu= atoi(arreglo[i*2+2]);
 	if (0 <= *consu && *consu <= 1000){
-	  printf("El consumo es %d \n", *consu);
+	  // printf("El consumo es %d \n", *consu);
 	}else{ 
 	  perror("El numero del consumo debe estar en [0 - 1000]\n");
 
@@ -102,13 +100,13 @@ void argumentos_cliente (int numArg,char ** arreglo, char* nombr, int *inve, int
       }else if(!strcmp(arreglo[i*2 + 1],"-n")) {
 
 	strcpy(nombr, arreglo[i*2+2]);
-	printf("El nombre de la bomba es %s \n", nombr);
+	//	printf("El nombre de la bomba es %s \n", nombr);
     
       }else if(!strcmp(arreglo[i*2 + 1],"-i")) { 
 	
-	*inve= atoi(arreglo[i*2+2]);     // FIX Validar !!
+	*inve= atoi(arreglo[i*2+2]); 
 	if (0 <= *inve && *inve <= *camax){
-	  printf(" inventario es %d \n", *inve);
+	  // printf(" inventario es %d \n", *inve);
 	}else{
 	  perror("ERROR: El numero del Inventario no corresponde\n  Debe estar en [0 - capacidadMaxima]");
 
@@ -117,11 +115,11 @@ void argumentos_cliente (int numArg,char ** arreglo, char* nombr, int *inve, int
        
       }else if(!strcmp(arreglo[i*2 + 1],"-fc")) { 
 	strcpy(archi,arreglo[i*2+2]);
-	printf("El archivo Central es %s\n", archi);
+	//printf("El archivo Central es %s\n", archi);
        
       }else if(!strcmp(arreglo[i*2 + 1],"-cp")) { 
 
-	*camax = atoi(arreglo[i*2+2]); // FIX Validar !	
+	*camax = atoi(arreglo[i*2+2]);
 
       }else{
 	perror("Sintaxis invalida");
@@ -130,7 +128,7 @@ void argumentos_cliente (int numArg,char ** arreglo, char* nombr, int *inve, int
       } 
     }
     if (38000 <= *camax && *camax <= 380000){
-      printf("La Capacidad maxima es: %d \n", *camax);
+      // printf("La Capacidad maxima es: %d \n", *camax);
     }else{ 
       perror("El Numero de Capacidad Maxima \n Debe estar en [38000 - 3800000]\n");
      
@@ -153,11 +151,11 @@ void obtener_argumentos_servidor (int num,char ** arreglo, char* nombr, int *inv
     for(i = 0 ; i < 6 ; i++){ 
       if(!strcmp(arreglo[i*2 + 1],"-cp")) { 
 	  
-	*camax = atoi(arreglo[i*2+2]); // FIX Validar !!
+	*camax = atoi(arreglo[i*2+2]);
 	    
 	if (38000 <= *camax && *camax <= 380000){
 	  cp = true; 
-	  printf("La Capacidad maxima es: %d \n", *camax);
+	  //  printf("La Capacidad maxima es: %d \n", *camax);
 	}else { 
 	  perror("El Numero de Capacidad Maxima \n Debe estar en [38000 - 3800000]");
 	  exit(-1);
@@ -179,13 +177,13 @@ void obtener_argumentos_servidor (int num,char ** arreglo, char* nombr, int *inv
 	switch(op){
 	case'n':
 	  strcpy(nombr,optarg);
-	  printf("el nombre del centro es: %s \n", nombr);
+	  //	  printf("el nombre del centro es: %s \n", nombr);
 	  break;
 	case'i':
 	  *inve = atoi(optarg); 
 	   
 	  if (0 <= *inve && *inve <= *camax){
-	    printf(" inventario es %d \n", *inve);
+	    // printf(" inventario es %d \n", *inve);
 	  }else{
 	    perror("ERROR: El numero del Inventario no corresponde\n  Debe estar en [0 - capacidadMaxima]");
 
@@ -203,7 +201,7 @@ void obtener_argumentos_servidor (int num,char ** arreglo, char* nombr, int *inv
 	case's':
 	  *sum = atoi(optarg); 
 	  if (0 <=  *sum && *sum <= 10000){
-	    printf("el suministro es: %d \n",*sum );
+	    // printf("el suministro es: %d \n",*sum );
 	  }else{ 
 	    perror("ERROR: , El numero del suministro no es valido \n DEbe estar en [0 - 10000]");
 	    exit(-1);
@@ -213,7 +211,7 @@ void obtener_argumentos_servidor (int num,char ** arreglo, char* nombr, int *inv
 	case'p':
 	  *puert = atoi(optarg); 
 	  // Validar que el puerto este en un rango valido 
-	  printf("mi puerto es: %d \n", *puert);
+	  // printf("mi puerto es: %d \n", *puert);
 	  break;
 	case 'c':
 	  break;
@@ -228,14 +226,23 @@ void obtener_argumentos_servidor (int num,char ** arreglo, char* nombr, int *inv
   
 }
 
+/* Lee del archivo DNS la informacion correspondiente*/
+/* en los arreglos repectivos*/
 int obtener_lista_dns(char *filename,char ** nombre, 
 		      char **direcciones, int *puertos ){
    
   FILE *file = fopen ( filename, "r" ); // Validar esta llamada
   char *t;
   t = (char *) malloc (sizeof(char) * 128);
+  while(t == 0){
+    printf("Memoria no reservada, esperare un segundo");
+    sleep(1);
+    t = (char *) malloc (sizeof(char) * 128);
+   
+  }
+    
   int i = 0;
-  printf("filename....%s\n",filename);
+  // printf("filename....%s\n",filename);
 
   if ( file != NULL ){
     
@@ -250,38 +257,53 @@ int obtener_lista_dns(char *filename,char ** nombre,
 
       while(t!=NULL){
 	if (j==0){
-	  nombre[i]= (char*) malloc(sizeof(char)*128); // FIX validar malloc
+	  
+	  nombre[i]= (char*) malloc(sizeof(char)*128); 
+	  while(nombre[i] == 0){
+	    printf("Memoria no reservada, esperare un segundo");
+	    sleep(1);
+	    nombre[i]= (char*) malloc(sizeof(char)*128); 
+	  }
+	  
 	  strcpy(nombre[i],t);
 	}
+	
 	if(j==1){
-	  direcciones[i]= (char*) malloc(sizeof(char)*128); // FIX validar
+	  
+	  direcciones[i]= (char*) malloc(sizeof(char)*128);
+	  while(direcciones[i] == 0){
+	    printf("Memoria no reservada, esperare un segundo");
+	    sleep(1);
+	    direcciones[i]= (char*) malloc(sizeof(char)*128); 
+	    
+	  }
 	  strcpy(direcciones[i],t);
+	  
 	}
 	if (j==2){
-	
-	  puertos[i]=atoi(t); // FIX validar
+	  
+	  puertos[i]=atoi(t); 
 	}
 	j=j+1;
-
 	t = strtok (NULL, "&\n");
       }
       i=i+1;
-    
+      
     }
-   
+    
     free(t);
     puertos[i]=0;
     direcciones[i]= NULL;
     nombre[i]=NULL;
     fclose ( file );
- 
-  }else{
+    
+}else{
     perror ( filename );
     exit(-1);
   }
   return 0;
 }
-
+/* Funcion Auxiliar que intercambia dos string*/
 void swapLetras(char** a , char** b){
   
   char * aux;
@@ -289,7 +311,7 @@ void swapLetras(char** a , char** b){
   *a = *b;
   *b = aux;
 }
-
+/* funcion auxiliar que intercambia dos enteros*/
 void swap(int *a , int *b){
   
   int aux;

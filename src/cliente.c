@@ -45,7 +45,7 @@ void *llevar_tiempo(void *arg_tiempo){
 
 
 int main(int argc, char *argv[]){
-  
+ 
   char nombre[MAX_LONG];  // Nombre de esta Bomba
   int capMax;             // Capacidad Máxima (Litros)
   char archivo[MAX_LONG]; // Nombre de archivo "DNS"
@@ -82,7 +82,7 @@ int main(int argc, char *argv[]){
       perror("Error al crear el socket");
       exit(-1);
     }
-    printf("direcciones %s",direcciones[k]);
+  
     if((he=gethostbyname(direcciones[k])) == NULL){
       perror("Error al identificar el host");
       tiempos[k] = 500; // Para que sea ignorado de la lista de servidores
@@ -116,7 +116,7 @@ int main(int argc, char *argv[]){
   int i = 0 ;
   int minimo;
   int j;
-  printf("Hola voy a ordenar \n");
+ 
 
   while (nombres[i]!=NULL){
    
@@ -135,7 +135,7 @@ int main(int argc, char *argv[]){
     swap(&puertos[i],&puertos[minimo]);
     i=i+1;
   }
-  printf("posicion 2 %d %d\n", tiempos[2],puertos[2]);
+ 
 
   // Iniciar contador de tiempo 
   pthread_t contador_tiempo;
