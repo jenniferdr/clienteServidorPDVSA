@@ -152,13 +152,15 @@ int main(int argc, char *argv[]){
       /*Crear el socket */
       if((sock= socket(AF_INET,SOCK_STREAM,0))==-1){
 	perror("Error al crear el socket cliente \n");
-	exit(0);
+	close(sock);
+	continue;
       }
       struct hostent *he;
       if( (he=gethostbyname(direcciones[r])) == NULL){
 	/*Pedir gasolina a otro servidor*/
 	perror("Error al identificar el host /n");
 	r = r + 1;
+	close(sock);
 	continue;
       }
       
@@ -172,6 +174,7 @@ int main(int argc, char *argv[]){
       if(connect(sock,(struct sockaddr*)&serv_addr,sizeof(struct sockaddr_in))==-1){ 
 	printf("Error al conectar con el servidor %s \n", direcciones[r]);
 	r = r + 1; 
+	close(sock);
 	continue;
       }
       
@@ -181,6 +184,7 @@ int main(int argc, char *argv[]){
       int recibidos;
       if( (recibidos= recv(sock,gasolina,20,0) ==- 1)){
 	perror("Error al recibir el mensaje\n");
+	close(sock);
 	r = r + 1;
 	continue;
       }
@@ -188,8 +192,9 @@ int main(int argc, char *argv[]){
       if (strcmp(gasolina,"noDisponible")==0){
 	fprintf(LOG,"Peticion: %d minutos, %s , No disponible, %d litros \n",
 		tiempo, nombres[r],inventario);
-	  r = r + 1; 
-	  continue;
+	close(sock);
+	r = r + 1; 
+	continue;
       } else {
 	fprintf(LOG,"Peticion: %d minutos, %s, OK, %d litros  \n",
 		tiempo, nombres[r],inventario);
