@@ -90,7 +90,7 @@ void argumentos_cliente (int numArg,char ** arreglo, char* nombr, int *inve, int
 
 	*consu= atoi(arreglo[i*2+2]);
 	if (0 <= *consu && *consu <= 1000){
-	  // printf("El consumo es %d \n", *consu);
+
 	}else{ 
 	  perror("El numero del consumo debe estar en [0 - 1000]\n");
 
@@ -100,13 +100,13 @@ void argumentos_cliente (int numArg,char ** arreglo, char* nombr, int *inve, int
       }else if(!strcmp(arreglo[i*2 + 1],"-n")) {
 
 	strcpy(nombr, arreglo[i*2+2]);
-	//	printf("El nombre de la bomba es %s \n", nombr);
+
     
       }else if(!strcmp(arreglo[i*2 + 1],"-i")) { 
 	
 	*inve= atoi(arreglo[i*2+2]); 
 	if (0 <= *inve && *inve <= *camax){
-	  // printf(" inventario es %d \n", *inve);
+
 	}else{
 	  perror("ERROR: El numero del Inventario no corresponde\n  Debe estar en [0 - capacidadMaxima]");
 
@@ -115,7 +115,7 @@ void argumentos_cliente (int numArg,char ** arreglo, char* nombr, int *inve, int
        
       }else if(!strcmp(arreglo[i*2 + 1],"-fc")) { 
 	strcpy(archi,arreglo[i*2+2]);
-	//printf("El archivo Central es %s\n", archi);
+
        
       }else if(!strcmp(arreglo[i*2 + 1],"-cp")) { 
 
@@ -128,7 +128,7 @@ void argumentos_cliente (int numArg,char ** arreglo, char* nombr, int *inve, int
       } 
     }
     if (38000 <= *camax && *camax <= 380000){
-      // printf("La Capacidad maxima es: %d \n", *camax);
+
     }else{ 
       perror("El Numero de Capacidad Maxima \n Debe estar en [38000 - 3800000]\n");
      
@@ -155,7 +155,7 @@ void obtener_argumentos_servidor (int num,char ** arreglo, char* nombr, int *inv
 	    
 	if (38000 <= *camax && *camax <= 380000){
 	  cp = true; 
-	  //  printf("La Capacidad maxima es: %d \n", *camax);
+
 	}else { 
 	  perror("El Numero de Capacidad Maxima \n Debe estar en [38000 - 3800000]");
 	  exit(-1);
@@ -177,13 +177,13 @@ void obtener_argumentos_servidor (int num,char ** arreglo, char* nombr, int *inv
 	switch(op){
 	case'n':
 	  strcpy(nombr,optarg);
-	  //	  printf("el nombre del centro es: %s \n", nombr);
+
 	  break;
 	case'i':
 	  *inve = atoi(optarg); 
 	   
 	  if (0 <= *inve && *inve <= *camax){
-	    // printf(" inventario es %d \n", *inve);
+
 	  }else{
 	    perror("ERROR: El numero del Inventario no corresponde\n  Debe estar en [0 - capacidadMaxima]");
 
@@ -192,7 +192,7 @@ void obtener_argumentos_servidor (int num,char ** arreglo, char* nombr, int *inv
 	case't':
 	  *tiem = atoi(optarg); 
 	  if (0 <=  *tiem && *tiem <= 180){
-	    printf("tiempo es: %d \n",*tiem );
+	    //  printf("tiempo es: %d \n",*tiem );
 	  }else{ 
 	    perror("ERROR: El numero del Tiempo no corresponde  \n Debe estar en [0 - 180]");
 	    exit(-1);  
@@ -201,7 +201,7 @@ void obtener_argumentos_servidor (int num,char ** arreglo, char* nombr, int *inv
 	case's':
 	  *sum = atoi(optarg); 
 	  if (0 <=  *sum && *sum <= 10000){
-	    // printf("el suministro es: %d \n",*sum );
+
 	  }else{ 
 	    perror("ERROR: , El numero del suministro no es valido \n DEbe estar en [0 - 10000]");
 	    exit(-1);
@@ -211,7 +211,7 @@ void obtener_argumentos_servidor (int num,char ** arreglo, char* nombr, int *inv
 	case'p':
 	  *puert = atoi(optarg); 
 	  // Validar que el puerto este en un rango valido 
-	  // printf("mi puerto es: %d \n", *puert);
+
 	  break;
 	case 'c':
 	  break;
@@ -231,7 +231,7 @@ void obtener_argumentos_servidor (int num,char ** arreglo, char* nombr, int *inv
 int obtener_lista_dns(char *filename,char ** nombre, 
 		      char **direcciones, int *puertos ){
    
-  FILE *file = fopen ( filename, "r" ); // Validar esta llamada
+  FILE *file = fopen ( filename, "r" ); 
   char *t;
   t = (char *) malloc (sizeof(char) * 128);
   while(t == 0){
@@ -242,7 +242,7 @@ int obtener_lista_dns(char *filename,char ** nombre,
   }
     
   int i = 0;
-  // printf("filename....%s\n",filename);
+
 
   if ( file != NULL ){
     
