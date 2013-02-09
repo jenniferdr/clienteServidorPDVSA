@@ -76,12 +76,12 @@ int main(int argc, char *argv[]){
     
     /*Crear el socket */
     if((sock= socket(AF_INET,SOCK_STREAM,0))==-1){
-      perror("Error al crear el socket /n");
+      perror("Error al crear el socket ");
       exit(-1);
     }
   
     if((he=gethostbyname(direcciones[k])) == NULL){
-      perror("Error al identificar el host/n");
+      perror("Error al identificar el host");
       tiempos[k] = 500; // Para que sea ignorado de la lista de servidores
       close(sock);
       k=k+1;
@@ -159,7 +159,7 @@ int main(int argc, char *argv[]){
       struct hostent *he;
       if( (he=gethostbyname(direcciones[r])) == NULL){
 	/*Pedir gasolina a otro servidor*/
-	perror("Error al identificar el host /n");
+	perror("Error al identificar el host ");
 	r = r + 1;
 	close(sock);
 	continue;
@@ -167,7 +167,12 @@ int main(int argc, char *argv[]){
       
       /*Recopilar los datos del servidor en serv_addr*/
       serv_addr.sin_family = AF_INET;
-      if (tiempos[r]==500){ r = r +1; continue;}
+      if (tiempos[r]==500){ 
+	r = r +1;
+	continue;
+	close(sock);
+      }
+
       serv_addr.sin_port = htons(puertos[r]); 
       serv_addr.sin_addr = *((struct in_addr *)he->h_addr);  
       bzero(&(serv_addr.sin_zero),8);
@@ -184,7 +189,7 @@ int main(int argc, char *argv[]){
       char gasolina[20];
       int recibidos;
       if( (recibidos= recv(sock,gasolina,20,0) ==- 1)){
-	perror("Error al recibir el mensaje\n");
+	perror("Error al recibir el mensaje");
 	close(sock);
 	r = r + 1;
 	continue;
