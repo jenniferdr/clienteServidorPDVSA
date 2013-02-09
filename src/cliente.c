@@ -8,16 +8,13 @@
  *          Jennifer Dos Reis
  */
 
-// Revisar que los prints en el log estan como ellos piden 
-// Ver el problema del segmentation fault (Creo que ya lo resolvi)
-// Poner las validaciones que faltan en llamadas como read y write
 #include "funciones.h"
 #include <pthread.h>
 
 pthread_mutex_t mutex;
 int inventario;
 int consumo; // Consumo promedio (Litros*Minutos)
-FILE *log;
+FILE *LOG;
 
 // Hilo encargado de actualizar tiempo e inventario
 void *llevar_tiempo(void *arg_tiempo){
@@ -34,11 +31,11 @@ void *llevar_tiempo(void *arg_tiempo){
     if(inventario!=0){
       inventario = inventario-consumo;
       if(inventario<0)inventario=0;
-      if (inventario==0){fprintf(log,"Tanque vacio: %d minutos \n", *tiempo);}
+      if (inventario==0){fprintf(LOG,"Tanque vacio: %d minutos \n", *tiempo);}
     }
     pthread_mutex_unlock(&mutex);
 
-    fflush(log);
+    fflush(LOG);
   }
   pthread_exit(0);
 }
@@ -59,15 +56,15 @@ int main(int argc, char *argv[]){
   argumentos_cliente(argc,argv,nombre,&inventario,&consumo,&capMax,archivo);
   obtener_lista_dns(archivo, nombres,direcciones,&puertos[0]);
  
-  // creacion del archivo log del cliente
-  char nombre_log[MAX_LONG];
-  sprintf(nombre_log,"log_%s.txt",nombre);
-  log = fopen(nombre_log,"w");
+  // creacion del archivo LOG del cliente
+  char nombre_LOG[MAX_LONG];
+  sprintf(nombre_LOG,"LOG_%s.txt",nombre);
+  LOG = fopen(nombre_LOG,"w");
 
 
-  fprintf(log,"Inventario inicial %d \n ", inventario);
-  if(inventario==0) fprintf(log,"Tanque vacio: 0 minutos \n");
-  if(inventario==capMax) fprintf(log,"Tanque full: 0 minutos \n");
+  fprintf(LOG,"Inventario inicial %d \n ", inventario);
+  if(inventario==0) fprintf(LOG,"Tanque vacio: 0 minutos \n");
+  if(inventario==capMax) fprintf(LOG,"Tanque full: 0 minutos \n");
   int k = 0;
  
    // CONNECTAR CON SERVIDORES PARA PEDIR TIEMPOS
@@ -152,28 +149,29 @@ int main(int argc, char *argv[]){
       int sock;
       struct sockaddr_in serv_addr;
       /*Crear el socket */
-      if((sock= socket(AF_INET,SOCK_STREAM,0))==-1)
+      if((sock= socket(AF_INET,SOCK_STREAM,0))==-1){
+	perror("Error al crear el socket cliente \n");
 	exit(0);
- 
+      }
       struct hostent *he;
       if( (he=gethostbyname(direcciones[r])) == NULL){
 	/*Pedir gasolina a otro servidor*/
 	perror("Error al identificar el host");
-	  r = r + 1;
-	  continue;
+	r = r + 1;
+	continue;
       }
       
       /*Recopilar los datos del servidor en serv_addr*/
       serv_addr.sin_family = AF_INET;
-      if (tiempos[r]==500){ r = r +1; continue;} // FIX IGUAL ACA
+      if (tiempos[r]==500){ r = r +1; continue;}
       serv_addr.sin_port = htons(puertos[r]); 
       serv_addr.sin_addr = *((struct in_addr *)he->h_addr);  
       bzero(&(serv_addr.sin_zero),8);
       
       if(connect(sock,(struct sockaddr*)&serv_addr,sizeof(struct sockaddr_in))==-1){ 
-	printf("Error al conectar con el servidor %s", direcciones[r]);
-	  r = r + 1; 
-	  continue;
+	printf("Error al conectar con el servidor %s \n", direcciones[r]);
+	r = r + 1; 
+	continue;
       }
       
       write(sock,nombre,MAX_LONG);
@@ -186,12 +184,12 @@ int main(int argc, char *argv[]){
       }
 
       if (strcmp(gasolina,"noDisponible")==0){
-	fprintf(log,"Peticion: %d minutos, %s , No disponible, %d litros \n",
+	fprintf(LOG,"Peticion: %d minutos, %s , No disponible, %d litros \n",
 		tiempo, nombres[r],inventario);
 	  r = r + 1; 
 	  continue;
       } else {
-	fprintf(log,"Peticion: %d minutos, %s, OK, %d litros  \n",
+	fprintf(LOG,"Peticion: %d minutos, %s, OK, %d litros  \n",
 		tiempo, nombres[r],inventario);
 	
 	usleep(tiempos[r]*100000); 
@@ -200,8 +198,8 @@ int main(int argc, char *argv[]){
 	inventario = inventario + 38000;
 	pthread_mutex_unlock(&mutex);
 
-	fprintf(log,"Llegada Gandola: %d minutos, %d litros \n", tiempo,inventario);
-	if (inventario==capMax){ fprintf(log,"Tanque Full: %d minutos\n",tiempo);}
+	fprintf(LOG,"Llegada Gandola: %d minutos, %d litros \n", tiempo,inventario);
+	if (inventario==capMax){ fprintf(LOG,"Tanque Full: %d minutos\n",tiempo);}
 
 	// Reiniciar la busqueda de servidores activos
 	r = 0;
@@ -209,7 +207,7 @@ int main(int argc, char *argv[]){
       close(sock);
     }
   }
-  fclose(log);
+  fclose(LOG);
   
   return 0;
 }

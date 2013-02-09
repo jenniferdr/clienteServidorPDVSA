@@ -10,15 +10,17 @@
 
 #include "funciones.h"
 
-int inventario;  // Inventario actual
-int capMax;      // Capacidad Máxima (Litros)
+int inventario;    // Inventario actual
+int capMax;        // Capacidad Máxima (Litros)
 int tiempo_actual; // minutos
-int suministro; // Suministro promedio (Litros*Minutos)
-FILE *log;
+int suministro;    // Suministro promedio (Litros*Minutos)
+FILE *LOG;         // Archivo para la bitacora del servidor  
 pthread_mutex_t mutex; // mutex sobre el inventario
-int tiempo_respuesta;
+int tiempo_respuesta; 
 
-// Hilo encargad de actualizar tiempo e inventario
+/* Hilo encargado de actualizar tiempo e inventario
+ * Recibe un apuntador a una variable entera(tiempo)
+ */
 void *llevar_tiempo(void *arg_tiempo){
   pthread_detach(pthread_self());
 
@@ -33,7 +35,7 @@ void *llevar_tiempo(void *arg_tiempo){
       inventario= inventario + suministro;
     }else if(inventario!=capMax){
       inventario= capMax;
-      fprintf(log,"Tanque full: %d minutos \n",tiempo_actual);
+      fprintf(LOG,"Tanque full: %d minutos \n",tiempo_actual);
     }
     pthread_mutex_unlock(&mutex);
 
@@ -41,10 +43,11 @@ void *llevar_tiempo(void *arg_tiempo){
   pthread_exit(0);
 }
 
-// Hilo encargado de despachar las gandolas
+/* Hilo encargado de despachar las gandolas
+ * Recibe un apuntador al socket por el que debe responder
+ */
 void *atender_cliente(void *socket){
   pthread_detach(pthread_self());
-
   int *mi_socket;
   mi_socket= (int*)socket;
   
@@ -54,7 +57,9 @@ void *atender_cliente(void *socket){
 
   if( (recibidos= recv(*mi_socket,buff,MAX_LONG,0)== -1)){
     perror("Error al recibir el mensaje");
-    // No se si hay que avisar al hijo 
+    close(*mi_socket);
+    *mi_socket=-1;
+    pthread_exit(0);
   }
 
   if(strcmp(buff,"Tiempo")==0){
@@ -65,14 +70,14 @@ void *atender_cliente(void *socket){
     pthread_mutex_lock(&mutex);
     if( inventario >= 38000 ){
       inventario= inventario - 38000;
-      if(inventario==0)fprintf(log,"Tanque vacío: %d minutos \n",tiempo_actual);
+      if(inventario==0)fprintf(LOG,"Tanque vacío: %d minutos \n",tiempo_actual);
       write(*mi_socket,"enviando",sizeof(char)*9);
-      fprintf(log,"Suministro: %d minutos, %s, OK, %d litros \n"
+      fprintf(LOG,"Suministro: %d minutos, %s, OK, %d litros \n"
 	      ,tiempo_actual,buff,inventario);
     }else{
       write(*mi_socket,"noDisponible",sizeof(char)*14);
       printf("Centro con inventario insuficiente \n");
-      fprintf(log,"Suministro: %d minutos, %s, No disponible, %d litros \n"
+      fprintf(LOG,"Suministro: %d minutos, %s, No disponible, %d litros \n"
 	      ,tiempo_actual,buff,inventario);
     }
     pthread_mutex_unlock(&mutex);
@@ -95,15 +100,15 @@ int main(int argc, char *argv[]){
   obtener_argumentos_servidor(argc,argv,nombre_centro,&inventario, 
 			      &tiempo_respuesta,&suministro,&puerto,&capMax);
 
-  //Configurar el log del servidor
-  char nombre_log[MAX_LONG];
-  sprintf(nombre_log,"log_%s.txt",nombre_centro);
-  log = fopen(nombre_log,"w");
+  //Configurar el LOG del servidor
+  char nombre_LOG[MAX_LONG];
+  sprintf(nombre_LOG,"LOG_%s.txt",nombre_centro);
+  LOG = fopen(nombre_LOG,"w");
 
-  fprintf(log,"Inventario inicial: %d litros \n",inventario);
-  if(inventario==0) fprintf(log,"Tanque vacio: 0 minutos \n");
-  if(inventario==capMax) fprintf(log,"Tanque full: 0 minutos \n");
-  fflush(log);
+  fprintf(LOG,"Inventario inicial: %d litros \n",inventario);
+  if(inventario==0) fprintf(LOG,"Tanque vacio: 0 minutos \n");
+  if(inventario==capMax) fprintf(LOG,"Tanque full: 0 minutos \n");
+  fflush(LOG);
 
   // Iicializar arreglo de sockets 
   int j;
@@ -152,12 +157,12 @@ int main(int argc, char *argv[]){
     pthread_t trabajador;
     pthread_create(&trabajador,NULL,atender_cliente,&sockets[i]);
    
-    fflush(log);
+    fflush(LOG);
   }
 
   usleep(100000);
 
-  fclose(log);
+  fclose(LOG);
   close(sock);
   return 0;
 
