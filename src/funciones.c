@@ -10,7 +10,7 @@
 /*
  * Muestra por pantalla la sintaxis correcta para 
  * llamar al programa cliente (Bomba).
-*/
+ */
 void opciones_cliente(){
   printf("Sintaxis Correcta para el Cliente \n");
   printf("-n <Nombre De la bomba> \n");
@@ -80,6 +80,7 @@ void argumentos_cliente (int numArg,char ** arreglo, char* nombr, int *inve, int
   if (numArg !=11){
     perror( "Sintaxis Incorrecta \n");
     opciones_cliente();
+    exit(-1);
     
   }else{
     int i;
@@ -94,7 +95,7 @@ void argumentos_cliente (int numArg,char ** arreglo, char* nombr, int *inve, int
 	  printf("El consumo es %d \n", *consu);
 	}else{ 
 	  perror("El numero del consumo debe estar en [0 - 1000]\n");
-	   // FIX Salir de la funcion para cerrar el programa !!
+
 	  exit(-1);
 	}
 
@@ -110,7 +111,7 @@ void argumentos_cliente (int numArg,char ** arreglo, char* nombr, int *inve, int
 	  printf(" inventario es %d \n", *inve);
 	}else{
 	  perror("ERROR: El numero del Inventario no corresponde\n  Debe estar en [0 - capacidadMaxima]");
-	  // FIX Salirse del programa
+
 	  exit(-1);
 	}
        
@@ -132,8 +133,8 @@ void argumentos_cliente (int numArg,char ** arreglo, char* nombr, int *inve, int
       printf("La Capacidad maxima es: %d \n", *camax);
     }else{ 
       perror("El Numero de Capacidad Maxima \n Debe estar en [38000 - 3800000]\n");
-      // FIX Salir de la funcion para cerrar el programa !!
-	  exit(-1);
+     
+      exit(-1);
     }
     
   }
@@ -159,7 +160,7 @@ void obtener_argumentos_servidor (int num,char ** arreglo, char* nombr, int *inv
 	  printf("La Capacidad maxima es: %d \n", *camax);
 	}else { 
 	  perror("El Numero de Capacidad Maxima \n Debe estar en [38000 - 3800000]");
-	  // Salirse del programa
+	  exit(-1);
 	}
 	break; 
       } 
@@ -169,9 +170,10 @@ void obtener_argumentos_servidor (int num,char ** arreglo, char* nombr, int *inv
       opciones_servidor(); 
       perror("ERROR : No coloco la opcion -cp  ");
       perror("El Numero de Capacidad Maxima \n Debe estar en [38000 - 3800000]");
-      // FIX Salirse del programa !!
+      exit(-1);
+
     }else{ 
-      opterr=0;
+      opterr = 0;
 	  
       while((op=getopt(num,arreglo,"n:i:t:s:p:c:"))!=-1)
 	switch(op){
@@ -180,35 +182,36 @@ void obtener_argumentos_servidor (int num,char ** arreglo, char* nombr, int *inv
 	  printf("el nombre del centro es: %s \n", nombr);
 	  break;
 	case'i':
-	  *inve = atoi(optarg); // FIX Validar !!
+	  *inve = atoi(optarg); 
 	   
 	  if (0 <= *inve && *inve <= *camax){
 	    printf(" inventario es %d \n", *inve);
 	  }else{
 	    perror("ERROR: El numero del Inventario no corresponde\n  Debe estar en [0 - capacidadMaxima]");
-	    // FIX Salir del programa !!
+
 	  }
 	  break;
 	case't':
-	  *tiem = atoi(optarg); // FIX Validar !!
+	  *tiem = atoi(optarg); 
 	  if (0 <=  *tiem && *tiem <= 180){
 	    printf("tiempo es: %d \n",*tiem );
 	  }else{ 
 	    perror("ERROR: El numero del Tiempo no corresponde  \n Debe estar en [0 - 180]");
-	    // FIX Salirse del programa !!
+	    exit(-1);  
 	  }
 	  break;
 	case's':
-	  *sum = atoi(optarg); // FIX Validar !!
+	  *sum = atoi(optarg); 
 	  if (0 <=  *sum && *sum <= 10000){
 	    printf("el suministro es: %d \n",*sum );
 	  }else{ 
 	    perror("ERROR: , El numero del suministro no es valido \n DEbe estar en [0 - 10000]");
-	    // FIX Salir del programa !!
+	    exit(-1);
+	   
 	  }
 	  break;
 	case'p':
-	  *puert = atoi(optarg); // FIX Validar !!
+	  *puert = atoi(optarg); 
 	  // Validar que el puerto este en un rango valido 
 	  printf("mi puerto es: %d \n", *puert);
 	  break;
@@ -217,7 +220,7 @@ void obtener_argumentos_servidor (int num,char ** arreglo, char* nombr, int *inv
 	case '?':
 	  perror("Error: Opcion Desconocida\n");
 	  opciones_servidor();
-	  // FIX Salir del programa !!
+	 
 	  break;
 	} 
     } 
@@ -242,9 +245,9 @@ int obtener_lista_dns(char *filename,char ** nombre,
       if(strcmp(linea,"\n")==0)continue;
 
       t=strtok(linea,"&\n");
-      //    printf("token %s",t);
+    
       int j=0;
-      // printf("Comenzando un while\n");
+
       while(t!=NULL){
 	if (j==0){
 	  nombre[i]= (char*) malloc(sizeof(char)*128); // FIX validar malloc
@@ -255,7 +258,7 @@ int obtener_lista_dns(char *filename,char ** nombre,
 	  strcpy(direcciones[i],t);
 	}
 	if (j==2){
-	  // printf("TE es:'%s'\n",t);
+	
 	  puertos[i]=atoi(t); // FIX validar
 	}
 	j=j+1;
@@ -263,7 +266,7 @@ int obtener_lista_dns(char *filename,char ** nombre,
 	t = strtok (NULL, "&\n");
       }
       i=i+1;
-      printf("Valor de i: %d \n",i);
+    
     }
    
     free(t);
@@ -277,5 +280,21 @@ int obtener_lista_dns(char *filename,char ** nombre,
     exit(-1);
   }
   return 0;
+}
+
+void swapLetras(char** a , char** b){
+  
+  char * aux;
+  aux = *a;
+  *a = *b;
+  *b = aux;
+}
+
+void swap(int *a , int *b){
+  
+  int aux;
+  aux = *a;
+  *a = *b;
+  *b = aux;
 }
 

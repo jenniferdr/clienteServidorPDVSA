@@ -42,22 +42,6 @@ void *llevar_tiempo(void *arg_tiempo){
   pthread_exit(0);
 }
 
-void swapLetras(char** a , char** b){
-   
-    char * aux;
-    aux = *a;
-    *a = *b;
-    *b = aux;
-  }
-
-  void swap(int *a , int *b){
-   
-    int aux;
-    aux = *a;
-    *a = *b;
-    *b = aux;
-  }
-
 
 int main(int argc, char *argv[]){
   
