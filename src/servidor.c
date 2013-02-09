@@ -102,7 +102,7 @@ int main(int argc, char *argv[]){
 
   //Configurar el LOG del servidor
   char nombre_LOG[MAX_LONG];
-  sprintf(nombre_LOG,"LOG_%s.txt",nombre_centro);
+  sprintf(nombre_LOG,"log_%s.txt",nombre_centro);
   LOG = fopen(nombre_LOG,"w");
 
   fprintf(LOG,"Inventario inicial: %d litros \n",inventario);

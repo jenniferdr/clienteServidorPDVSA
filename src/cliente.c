@@ -58,7 +58,7 @@ int main(int argc, char *argv[]){
  
   // creacion del archivo LOG del cliente
   char nombre_LOG[MAX_LONG];
-  sprintf(nombre_LOG,"LOG_%s.txt",nombre);
+  sprintf(nombre_LOG,"log_%s.txt",nombre);
   LOG = fopen(nombre_LOG,"w");
 
 
@@ -149,6 +149,12 @@ int main(int argc, char *argv[]){
     if(direcciones[r]==NULL)r=0;
 
     if ((capMax-inventario)>=38000){
+      // Verificar si el servidor respondio al pedir tiempos
+      if (tiempos[r]==500){ 
+	r = r +1;
+	continue;
+      }
+
       int sock;
       struct sockaddr_in serv_addr;
       /*Crear el socket */
@@ -167,12 +173,6 @@ int main(int argc, char *argv[]){
       
       /*Recopilar los datos del servidor en serv_addr*/
       serv_addr.sin_family = AF_INET;
-      if (tiempos[r]==500){ 
-	r = r +1;
-	continue;
-	close(sock);
-      }
-
       serv_addr.sin_port = htons(puertos[r]); 
       serv_addr.sin_addr = *((struct in_addr *)he->h_addr);  
       bzero(&(serv_addr.sin_zero),8);
