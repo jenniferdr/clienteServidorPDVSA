@@ -8,6 +8,7 @@
  *          Jennifer Dos Reis
  */
 
+#include "servicioPDVSA.h"
 #include "funciones.h"
 #include <pthread.h>
 
@@ -44,12 +45,14 @@ void *llevar_tiempo(void *arg_tiempo){
 int main(int argc, char *argv[]){
  
   char nombre[MAX_LONG];  // Nombre de esta Bomba
+  char *nombre_pointer= &nombre[0]; 
   int capMax;             // Capacidad Máxima (Litros)
   char archivo[MAX_LONG]; // Nombre de archivo "DNS"
 
   // Datos de los servidores
   char* nombres[MAX_SERVERS];
   char* direcciones[MAX_SERVERS];
+  CLIENT *clnts[MAX_SERVERS];
   int puertos[MAX_SERVERS];
   int tiempos[MAX_SERVERS];
 
@@ -61,54 +64,30 @@ int main(int argc, char *argv[]){
   sprintf(nombre_LOG,"log_%s.txt",nombre);
   LOG = fopen(nombre_LOG,"w");
 
-
   fprintf(LOG,"Inventario inicial %d \n ", inventario);
   if(inventario==0) fprintf(LOG,"Tanque vacio: 0 minutos \n");
   if(inventario==capMax) fprintf(LOG,"Tanque full: 0 minutos \n");
+  
+  // PEDIR TIEMPOS
   int k = 0;
- 
-   // CONNECTAR CON SERVIDORES PARA PEDIR TIEMPOS
-  while ((direcciones[k])!= NULL){
-    
-    int sock;
-    struct sockaddr_in serv_addr;
-    struct hostent *he;
-    
-    /*Crear el socket */
-    if((sock= socket(AF_INET,SOCK_STREAM,0))==-1){
-      perror("Error al crear el socket ");
-      exit(-1);
-    }
-  
-    if((he=gethostbyname(direcciones[k])) == NULL){
-      perror("Error al identificar el host");
-      tiempos[k] = 500; // Para que sea ignorado de la lista de servidores
-      close(sock);
-      k=k+1;
+  while ((direcciones[k]) != NULL){
+
+    clnts[k]= clnt_create (direcciones[k], SERVICIOPDVSA, SERVICIOPDVSAVERS, "tcp");
+    if(clnts[k] == NULL){
+      clnt_pcreateerror( direcciones[k] );
+      tiempos[k] = 500;
+      k = k + 1;
       continue;
     }
-    /*Recopilar los datos del servidor en serv_addr*/
-    serv_addr.sin_family = AF_INET;
-    serv_addr.sin_port = htons(puertos[k]); 
-    serv_addr.sin_addr = *((struct in_addr *)he->h_addr);  
-    bzero(&(serv_addr.sin_zero),8);
-   
-    if(connect(sock,(struct sockaddr*)&serv_addr,sizeof(struct sockaddr_in))==-1){
-      printf("Error de conexion al pedir tiempos: servidor %s en el puerto %d \n"
-	     ,direcciones[k],puertos[k]);
-      tiempos[k] = 500; // Para que sea ignorado de la lista de servidores
-      close(sock);
-      k = k+1;
-      continue;
+
+    int *result = pedir_tiempo_1(NULL,clnts[k]);
+    if ( result == (int *)NULL){
+      clnt_perror( clnts[k], "Error al conectar con servidor");
+    }else{
+      tiempos[k]= *result;
     }
     
-   
-    write(sock,"Tiempo",9);
-    read(sock,&tiempos[k],sizeof(int));
-  
     k = k + 1;
-    close(sock);
-   
   }
  
   // ORDENAR EL ARREGLO DE TIEMPOS y TODOS LOS DEMAS 
@@ -116,7 +95,6 @@ int main(int argc, char *argv[]){
   int minimo;
   int j;
  
-
   while (nombres[i]!=NULL){
    
     minimo = i;
@@ -145,67 +123,40 @@ int main(int argc, char *argv[]){
   int r = 0;
  
   while (tiempo <= 480){
-   
-    if(direcciones[r]==NULL)r=0;
+    //Iterar sobre los servidores "direcciones[r]" pidiendo gasolina
+
+    if(direcciones[r]==NULL){
+      // Si llegamos al final de la lista, reiniciar.
+      r=0;
+      usleep(100000);
+    }
 
     if ((capMax-inventario)>=38000){
-      // Verificar si el servidor respondio al pedir tiempos
+
+      // Verificar si el servidor r respondió al pedir tiempos
       if (tiempos[r]==500){ 
 	r = r +1;
 	continue;
       }
 
-      int sock;
-      struct sockaddr_in serv_addr;
-      /*Crear el socket */
-      if((sock= socket(AF_INET,SOCK_STREAM,0))==-1){
-	perror("Error al crear el socket cliente \n");
-	continue;
-      }
-      struct hostent *he;
-      if( (he=gethostbyname(direcciones[r])) == NULL){
-	/*Pedir gasolina a otro servidor*/
-	perror("Error al identificar el host ");
-	r = r + 1;
-	close(sock);
-	continue;
-      }
-      
-      /*Recopilar los datos del servidor en serv_addr*/
-      serv_addr.sin_family = AF_INET;
-      serv_addr.sin_port = htons(puertos[r]); 
-      serv_addr.sin_addr = *((struct in_addr *)he->h_addr);  
-      bzero(&(serv_addr.sin_zero),8);
-      
-      if(connect(sock,(struct sockaddr*)&serv_addr,sizeof(struct sockaddr_in))==-1){ 
-	printf("Error al conectar con el servidor %s \n", direcciones[r]);
-	r = r + 1; 
-	close(sock);
-	continue;
-      }
-      
-      write(sock,nombre,MAX_LONG);
-      
       char gasolina[20];
-      int recibidos;
-      if( (recibidos= recv(sock,gasolina,20,0) ==- 1)){
-	perror("Error al recibir el mensaje");
-	close(sock);
-	r = r + 1;
-	continue;
+      char **result2= pedir_gasolina_1( &nombre_pointer, clnts[r] );
+      if ( result2 == (char **)NULL){
+	clnt_perror( clnts[k], "Error al conectar con servidor");
+      }else{
+	strcpy(gasolina,*result2);
       }
-
+      
       if (strcmp(gasolina,"noDisponible")==0){
 	fprintf(LOG,"Peticion: %d minutos, %s , No disponible, %d litros \n",
 		tiempo, nombres[r],inventario);
-	close(sock);
 	r = r + 1; 
 	continue;
       } else {
 	fprintf(LOG,"Peticion: %d minutos, %s, OK, %d litros  \n",
 		tiempo, nombres[r],inventario);
 	
-	usleep(tiempos[r]*100000); 
+	usleep((tiempos[r]+1)*100000); 
 
 	pthread_mutex_lock(&mutex);
 	inventario = inventario + 38000;
@@ -217,10 +168,11 @@ int main(int argc, char *argv[]){
 	// Reiniciar la busqueda de servidores activos
 	r = 0;
       } 
-      close(sock);
-    }
-  }
-  fclose(LOG);
-  
+      
+    }// fin del if (que verifica si se necesita gasolina)
+
+  }// Fin del while (Se acabó el tiempo)
+
+  fclose(LOG);  
   return 0;
 }
