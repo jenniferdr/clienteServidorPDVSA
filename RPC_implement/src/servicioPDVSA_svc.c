@@ -22,6 +22,7 @@ serviciopdvsa_1(struct svc_req *rqstp, register SVCXPRT *transp)
 {
 	union {
 		char *pedir_gasolina_1_arg;
+		char *enviar_respuesta_1_arg;
 	} argument;
 	char *result;
 	xdrproc_t _xdr_argument, _xdr_result;
@@ -42,6 +43,18 @@ serviciopdvsa_1(struct svc_req *rqstp, register SVCXPRT *transp)
 		_xdr_argument = (xdrproc_t) xdr_void;
 		_xdr_result = (xdrproc_t) xdr_int;
 		local = (char *(*)(char *, struct svc_req *)) pedir_tiempo_1_svc;
+		break;
+
+	case PEDIR_RETO:
+		_xdr_argument = (xdrproc_t) xdr_void;
+		_xdr_result = (xdrproc_t) xdr_int;
+		local = (char *(*)(char *, struct svc_req *)) pedir_reto_1_svc;
+		break;
+
+	case ENVIAR_RESPUESTA:
+		_xdr_argument = (xdrproc_t) xdr_wrapstring;
+		_xdr_result = (xdrproc_t) xdr_int;
+		local = (char *(*)(char *, struct svc_req *)) enviar_respuesta_1_svc;
 		break;
 
 	default:
