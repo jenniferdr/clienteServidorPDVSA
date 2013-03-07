@@ -37,10 +37,9 @@ void *llevar_tiempo(void *arg_tiempo){
 void tareas_servidor(int argc, char **argv){
 
   char nombre_centro[MAX_LONG];
-  int puerto; // Ya no es necesario (Modificar obtener_argumentos)
-
+  
   obtener_argumentos_servidor(argc,argv,nombre_centro,&inventario, 
-			      &tiempo_respuesta,&suministro,&puerto,&capMax);
+			      &tiempo_respuesta,&suministro,&capMax);
 
   //Configurar el LOG del servidor
   char nombre_LOG[MAX_LONG];
@@ -56,7 +55,5 @@ void tareas_servidor(int argc, char **argv){
   pthread_t contador_tiempo;
   tiempo_actual=0;
   pthread_create(&contador_tiempo,NULL,llevar_tiempo,&tiempo_actual);
-
-  
 
 }
