@@ -152,6 +152,14 @@ int main(int argc, char *argv[]){
 		tiempo, nombres[r],inventario);
 	r = r + 1; 
 	continue;
+	// ver si su ticket esta vigente 
+      } else if (strcmp(gasolina,"noTicket")==0){
+	// pedir el reto
+	// encriptarlo
+	// enviarlo
+	// pedir gasolina
+	printf("debo Autenticarme");
+
       } else {
 	fprintf(LOG,"Peticion: %d minutos, %s, OK, %d litros  \n",
 		tiempo, nombres[r],inventario);
