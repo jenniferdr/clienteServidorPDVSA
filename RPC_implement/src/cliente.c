@@ -154,11 +154,20 @@ int main(int argc, char *argv[]){
 	continue;
 	// ver si su ticket esta vigente 
       } else if (strcmp(gasolina,"noTicket")==0){
-	// pedir el reto
-	// encriptarlo
-	// enviarlo
-	// pedir gasolina
-	printf("debo Autenticarme");
+	//int *nuRandom = pedir_reto_1(NULL,clnts[k]);
+	 char * encriptado; 
+	 // encriptado = encriptarlo
+	 
+	 int *respuesta; 
+	 //*respuesta = enviar_respuesta_1(encriptado, clnts[r] );
+	 if ( respuesta == (int *)NULL){
+	   printf("error a autentificarse");
+	   // que hacemos volvemos a intentar???
+	 }
+	 else{
+	   continue;
+	   // para pedir gasolina de nuevo
+	 } 
 
       } else {
 	fprintf(LOG,"Peticion: %d minutos, %s, OK, %d litros  \n",
