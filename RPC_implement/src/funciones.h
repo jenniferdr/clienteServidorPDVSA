@@ -49,7 +49,7 @@ void argumentos_cliente (int numArg,char ** arreglo, char* nombr, int *inve,
 
 /* Validar y obtener los argumentos del servidor */
 void obtener_argumentos_servidor (int num,char ** arreglo, char* nombr, int *inve,
-				  int *tiem, int *sum,int *puert, int *camax);
+				  int *tiem, int *sum, int *camax);
 
 /* Lee del archivo DNS la informacion correspondiente*/
 /* en los arreglos repectivos*/

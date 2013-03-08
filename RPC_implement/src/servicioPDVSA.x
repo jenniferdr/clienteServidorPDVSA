@@ -7,6 +7,10 @@ program SERVICIOPDVSA {
 
       int PEDIR_TIEMPO() = 2;
 
+      int PEDIR_RETO() = 3;
+
+      int ENVIAR_RESPUESTA(string) = 4;
+
    } = 1;
 
 } = 0x20000001;

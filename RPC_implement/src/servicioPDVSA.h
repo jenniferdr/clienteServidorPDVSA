@@ -24,6 +24,12 @@ extern  char ** pedir_gasolina_1_svc(char **, struct svc_req *);
 #define PEDIR_TIEMPO 2
 extern  int * pedir_tiempo_1(void *, CLIENT *);
 extern  int * pedir_tiempo_1_svc(void *, struct svc_req *);
+#define PEDIR_RETO 3
+extern  int * pedir_reto_1(void *, CLIENT *);
+extern  int * pedir_reto_1_svc(void *, struct svc_req *);
+#define ENVIAR_RESPUESTA 4
+extern  int * enviar_respuesta_1(char **, CLIENT *);
+extern  int * enviar_respuesta_1_svc(char **, struct svc_req *);
 extern int serviciopdvsa_1_freeresult (SVCXPRT *, xdrproc_t, caddr_t);
 
 #else /* K&R C */
@@ -33,6 +39,12 @@ extern  char ** pedir_gasolina_1_svc();
 #define PEDIR_TIEMPO 2
 extern  int * pedir_tiempo_1();
 extern  int * pedir_tiempo_1_svc();
+#define PEDIR_RETO 3
+extern  int * pedir_reto_1();
+extern  int * pedir_reto_1_svc();
+#define ENVIAR_RESPUESTA 4
+extern  int * enviar_respuesta_1();
+extern  int * enviar_respuesta_1_svc();
 extern int serviciopdvsa_1_freeresult ();
 #endif /* K&R C */
 

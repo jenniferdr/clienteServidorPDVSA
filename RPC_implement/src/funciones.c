@@ -29,46 +29,9 @@ void opciones_servidor(){
   printf("-s <Cantidad De Suministro > \n");
   printf("-t <Tiempo> \n");
   printf("-cp <Numero Capacidad Maxima> \n");
-  printf(" -p  <Puerto>");
+  //printf(" -p  <Puerto>");
 }
 
-/*
- * Crea un socket TCP no bloqueante, configura el bind() y listen()
- * Toma como argumento el puerto en el que se desea asociar el socket y
- * un apuntador a entero.
- * El descriptor del socket será guardado en la dirección de memoria
- * apuntada por la variable sock.
- */
-void obtener_socket_servidor(int puerto,int *sock){
-  
-  /*Crear el socket */
-  if((*sock= socket(AF_INET,SOCK_STREAM,0))==-1){
-    perror("Error al inicializar el socket");
-    exit(-1);
-  }
-  fcntl(*sock,F_SETFL, O_NONBLOCK);
-  struct sockaddr_in serv_addr;
-
-  /*Asignar dirección del servidor en serv_addr para hacer el bind() */
-  serv_addr.sin_family = AF_INET; 
-  serv_addr.sin_port = htons(puerto);
-  serv_addr.sin_addr.s_addr = INADDR_ANY;
-  bzero(&(serv_addr.sin_zero), 8);
-  
-  int sizeSockadd = sizeof(struct sockaddr_in);
-
-  if(bind(*sock,(struct sockaddr*) &serv_addr,sizeSockadd)==-1){
-    perror("Error al hacer el bind del socket");
-    exit(-1);
-  }
-
-  /*Establecer número máximo de clientes*/
-  if(listen(*sock, BACK) == -1){
-    perror("Error al escuchar por el socket");
-    exit(-1);    
-  }
-
-}
 
 /*  Realiza la validacion de los argumentos del cliente*/
 /* Que esten completos y que la informacion sea correcta */
@@ -132,11 +95,11 @@ void argumentos_cliente (int numArg,char ** arreglo, char* nombr, int *inve,
 
 /* Validar y obtener los argumentos del servidor */
 void obtener_argumentos_servidor (int num,char ** arreglo, char* nombr, int *inve,
-				  int *tiem, int *sum,int *puert, int *camax){
+				  int *tiem, int *sum, int *camax){
 
   int op;
   bool cp = false;
-  if (num !=13){
+  if (num !=12){
     perror( "Sintaxis Incorrecta");
     opciones_servidor(); 
     exit(-1);
@@ -167,7 +130,7 @@ void obtener_argumentos_servidor (int num,char ** arreglo, char* nombr, int *inv
     }else{ 
       opterr = 0;
 	  
-      while((op=getopt(num,arreglo,"n:i:t:s:p:c:"))!=-1)
+      while((op=getopt(num,arreglo,"n:i:t:s:c:"))!=-1)
 	switch(op){
 	case'n':
 	  strcpy(nombr,optarg);
@@ -192,13 +155,6 @@ void obtener_argumentos_servidor (int num,char ** arreglo, char* nombr, int *inv
 	  *sum = atoi(optarg); 
 	  if (0 >  *sum || *sum > 10000){
 	     perror("ERROR: , El numero del suministro no es valido \n DEbe estar en [0 - 10000]");
-	    exit(-1);
-	  }
-	  break;
-	case'p':
-	  *puert = atoi(optarg); 
-	  if (*puert<=0){
-	    perror("ERROR: El puerto debe ser un numero positivo");
 	    exit(-1);
 	  }
 	  break;

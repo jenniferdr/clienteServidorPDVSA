@@ -41,3 +41,13 @@ int *pedir_tiempo_1_svc(void *argp, struct svc_req *rqstp)
    
   return &tiempo_respuesta;
 }
+
+int *pedir_reto_1_svc(void *argp, struct svc_req *rqstp)
+{
+  return &tiempo_respuesta;
+}
+
+int *enviar_respuesta_1_svc(char ** resp, struct svc_req *rqstp)
+{
+  return &tiempo_respuesta;
+}
