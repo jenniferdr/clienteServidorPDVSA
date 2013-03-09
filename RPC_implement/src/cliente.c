@@ -43,7 +43,7 @@ void *llevar_tiempo(void *arg_tiempo){
 
 
 int main(int argc, char *argv[]){
- 
+  
   char nombre[MAX_LONG];  // Nombre de esta Bomba
   char *nombre_pointer= &nombre[0]; 
   int capMax;             // Capacidad Máxima (Litros)
@@ -55,7 +55,6 @@ int main(int argc, char *argv[]){
   CLIENT *clnts[MAX_SERVERS];
   int puertos[MAX_SERVERS];
   int tiempos[MAX_SERVERS];
-
   argumentos_cliente(argc,argv,nombre,&inventario,&consumo,&capMax,archivo);
   obtener_lista_dns(archivo, nombres,direcciones,&puertos[0]);
  
@@ -79,7 +78,7 @@ int main(int argc, char *argv[]){
       k = k + 1;
       continue;
     }
-
+     
     int *result = pedir_tiempo_1(NULL,clnts[k]);
     if ( result == (int *)NULL){
       clnt_perror( clnts[k], "Error al conectar con servidor");
@@ -115,16 +114,21 @@ int main(int argc, char *argv[]){
  
 
   // Iniciar contador de tiempo 
+  
   pthread_t contador_tiempo;
   int tiempo=0;
   pthread_create(&contador_tiempo,NULL,llevar_tiempo,&tiempo);
  
   /**** INICIO DE LA SIMULACION ****/ 
   int r = 0;
- 
+  //  char * encriptado1= "reto"; 
+  //int *nuRandom1 = enviar_respuesta_1(&encriptado1, clnts[0]);
+
+  //printf("numero %d",*nuRandom1);
+  //printf("hoooooooola %s \n", &encriptado1);
   while (tiempo <= 480){
     //Iterar sobre los servidores "direcciones[r]" pidiendo gasolina
-
+    
     if(direcciones[r]==NULL){
       // Si llegamos al final de la lista, reiniciar.
       r=0;
@@ -154,12 +158,12 @@ int main(int argc, char *argv[]){
 	continue;
 	// ver si su ticket esta vigente 
       } else if (strcmp(gasolina,"noTicket")==0){
-	//int *nuRandom = pedir_reto_1(NULL,clnts[k]);
-	 char * encriptado; 
-	 // encriptado = encriptarlo
+	int *nuRandom = pedir_reto_1(NULL,clnts[r]);
+	 char * encriptado= "reto"; 
+	 // debo encriptar es *nuRandom
+	 // encriptado = encriptarlo 
 	 
-	 int *respuesta; 
-	 //*respuesta = enviar_respuesta_1(encriptado, clnts[r] );
+	 int *respuesta = enviar_respuesta_1(&encriptado, clnts[r] );
 	 if ( respuesta == (int *)NULL){
 	   printf("error a autentificarse");
 	   // que hacemos volvemos a intentar???

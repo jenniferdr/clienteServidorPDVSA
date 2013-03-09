@@ -1,13 +1,16 @@
 
 #include "servicioPDVSA.h"
 #include "tareasServidor.h"
-
+#include <time.h>
 extern int tiempo_actual;
 extern int tiempo_respuesta;
 extern int inventario;
 extern pthread_mutex_t mutex;
 extern FILE *LOG;
-
+int numeroRn;
+char *retos[100];
+int ips[100];
+int cuota[100];
 /* NOTA: En estas funciones se usan variables globales.
  * Se encuentran definidas en "tareasServidor.h"
  */
@@ -44,10 +47,42 @@ int *pedir_tiempo_1_svc(void *argp, struct svc_req *rqstp)
 
 int *pedir_reto_1_svc(void *argp, struct svc_req *rqstp)
 {
-  return &tiempo_respuesta;
+ 
+  time_t reloj;
+  time (&reloj);
+  srand((unsigned int ) reloj);
+  // encriptar la variable reloj 
+  // guardar lo encriptado en una estructura global
+  // numeroRn = 5;
+  numeroRn = (int )reloj;
+  printf("numero real %d \n",numeroRn);
+  return &numeroRn;
 }
 
 int *enviar_respuesta_1_svc(char ** resp, struct svc_req *rqstp)
 {
-  return &tiempo_respuesta;
+  int i=0;
+  int ip;
+  // buscamos el ips del cliente
+  while (ips[i]!=ip && i < 99){
+    i = i+1;
+  }
+  // puede ser 99 o NULL creo mejor NULL o -1 pero hay que inicializar
+  if (i==99){
+    printf("error el cliente no se escuentra");
+    return (0);// retonnar codigo de error
+  }
+  // comparar la respuesta que nos dio el cliente 
+  if( retos[i]== *resp){
+    // como la respuesta fue correcta otorgo un ticket
+    cuota[i]= tiempo_actual + 5 ;
+   
+    printf("renovado el ticket del cliente %d",ips[i]);
+  } else {
+    // enviar codigo entero de error pues no coninciden claves
+    printf("no coinciden claves");
+    return (0);// retornar codigo de error
+  }
+ 
+  return (0);
 }
