@@ -58,14 +58,16 @@ int *pedir_tiempo_1_svc(void *argp, struct svc_req *rqstp)
 
 int *pedir_reto_1_svc(void *argp, struct svc_req *rqstp)
 {
- 
+  // El cliente deberia pasar su ip para poderlo identificar 
+
   time_t reloj;
   time (&reloj);
   srand((unsigned int ) reloj);
   // encriptar la variable reloj 
-  // guardar lo encriptado en una estructura global
-  // numeroRn = 5;
-  numeroRn = (int )reloj;
+  // Buscar el ticket del cliente por su ip (en el arreglo de tickets) 
+  // alli guardar la respuesta del reto en ticket[bla].reto
+ 
+  numeroRn = (int) reloj;
   printf("numero real %d \n",numeroRn);
   return &numeroRn;
 }
@@ -78,16 +80,18 @@ int *enviar_respuesta_1_svc(char ** resp, struct svc_req *rqstp)
   // buscamos el ips del cliente
 
   // donde debemos llenar este arreglo de ips??
+  // Se agregan las ips cada vez q se crea el ticket en pedir_gasolina
   while (ips[i]!=ip && i < 99){
     i = i+1;
   }
   // puede ser 99 o NULL creo mejor NULL o -1 pero hay que inicializar
+  // Podemos usar la constante MAX_SERVERS
   if (i==99){
     printf("error el cliente no se escuentra");
     return (0);// retonnar codigo de error
   }
   // comparar la respuesta que nos dio el cliente 
-  if( retos[i]== *resp){
+  if( retos[i]== *resp /* No comparar asi, con strcomp*/ ){
     // como la respuesta fue correcta otorgo un ticket
     cuota[i]= tiempo_actual + 5 ;
    
@@ -98,5 +102,6 @@ int *enviar_respuesta_1_svc(char ** resp, struct svc_req *rqstp)
     return (0);// retornar codigo de error
   }
  
+  // Xq se retorna 0 en ambos casos ?
   return (0);
 }
