@@ -40,7 +40,7 @@ void argumentos_cliente (int numArg,char ** arreglo, char* nombr, int *inve,
   int op;
 
   if (numArg !=11){
-    perror( "Sintaxis Incorrecta \n");
+    printf( "Sintaxis Incorrecta \n");
     opciones_cliente();
     exit(-1);
     
@@ -100,7 +100,7 @@ void obtener_argumentos_servidor (int num,char ** arreglo, char* nombr, int *inv
   int op;
   bool cp = false;
   if (num !=11){
-    perror( "Sintaxis Incorrecta");
+    printf( "Sintaxis Incorrecta \n");
     opciones_servidor(); 
     exit(-1);
   }else{
