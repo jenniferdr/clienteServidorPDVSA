@@ -121,9 +121,12 @@ int main(int argc, char *argv[]){
  
   /**** INICIO DE LA SIMULACION ****/ 
   int r = 0;
-  //  char * encriptado1= "reto"; 
-  //int *nuRandom1 = enviar_respuesta_1(&encriptado1, clnts[0]);
-
+  /*
+  char * encriptado1= "reto"; 
+  printf("aquiii %s\n",encriptado1);
+  printf("lo que mando %s\n",&encriptado1);
+  int *nuRandom1 = enviar_respuesta_1(&encriptado1, clnts[0]);
+  */
   //printf("numero %d",*nuRandom1);
   //printf("hoooooooola %s \n", &encriptado1);
   while (tiempo <= 480){

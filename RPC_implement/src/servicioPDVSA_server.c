@@ -63,7 +63,10 @@ int *enviar_respuesta_1_svc(char ** resp, struct svc_req *rqstp)
 {
   int i=0;
   int ip;
+  printf("respuesta %s \n", *resp);
   // buscamos el ips del cliente
+
+  // donde debemos llenar este arreglo de ips??
   while (ips[i]!=ip && i < 99){
     i = i+1;
   }
