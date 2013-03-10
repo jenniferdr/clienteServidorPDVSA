@@ -53,10 +53,10 @@ int main(int argc, char *argv[]){
   char* nombres[MAX_SERVERS];
   char* direcciones[MAX_SERVERS];
   CLIENT *clnts[MAX_SERVERS];
-  int puertos[MAX_SERVERS];
+  //int puertos[MAX_SERVERS];
   int tiempos[MAX_SERVERS];
   argumentos_cliente(argc,argv,nombre,&inventario,&consumo,&capMax,archivo);
-  obtener_lista_dns(archivo, nombres,direcciones,&puertos[0]);
+  obtener_lista_dns(archivo, nombres,direcciones/*,&puertos[0]*/);
  
   // creacion del archivo LOG del cliente
   char nombre_LOG[MAX_LONG];
@@ -108,7 +108,7 @@ int main(int argc, char *argv[]){
     swap(&tiempos[i],&tiempos[minimo]);
     swapLetras(&nombres[i],&nombres[minimo]);
     swapLetras(&direcciones[i],&direcciones[minimo]);
-    swap(&puertos[i],&puertos[minimo]);
+    //swap(&puertos[i],&puertos[minimo]);
     i=i+1;
   }
  

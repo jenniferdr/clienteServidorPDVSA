@@ -54,7 +54,7 @@ void obtener_argumentos_servidor (int num,char ** arreglo, char* nombr, int *inv
 /* Lee del archivo DNS la informacion correspondiente*/
 /* en los arreglos repectivos*/
 int obtener_lista_dns(char *filename,char ** nombre, 
-		      char **direcciones, int *puertos );
+		      char **direcciones/*, int *puertos*/ );
 
 /* Funcion Auxiliar que intercambia dos string*/
 void swapLetras(char** a , char** b);

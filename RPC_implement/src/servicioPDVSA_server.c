@@ -2,21 +2,24 @@
 #include "servicioPDVSA.h"
 #include "tareasServidor.h"
 #include <time.h>
+
+/* Variables globales que se encuentran definidas
+ * e inicializadas en "tareasServidor.h"
+ */
 extern int tiempo_actual;
 extern int tiempo_respuesta;
 extern int inventario;
 extern pthread_mutex_t mutex;
 extern FILE *LOG;
+
 int numeroRn;
 char *retos[100];
 int ips[100];
 int cuota[100];
-/* NOTA: En estas funciones se usan variables globales.
- * Se encuentran definidas en "tareasServidor.h"
- */
+
 
 char **pedir_gasolina_1_svc(char ** bomba, struct svc_req *rqstp)
-{
+{ // MODIFICAR
   static char *result;
   result= (char *) malloc(sizeof(char)*20);
   
