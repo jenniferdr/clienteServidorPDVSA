@@ -20,6 +20,14 @@ int cuota[100];
 
 char **pedir_gasolina_1_svc(char ** bomba, struct svc_req *rqstp)
 { // MODIFICAR
+  // Primero agregar un argumento para q el cliente de su ip
+
+  // 1. Buscar el ticket del cliente por su ip
+  //    Si no existe retornarle al cliente el string "noTicket"
+  //    si existe verificar si el tiempo es valido 
+  //       Si el ticket no es valido ¿reportar en el LOG? y retornar "noTicket"
+  //       Si es valido seguir ...
+
   static char *result;
   result= (char *) malloc(sizeof(char)*20);
   
