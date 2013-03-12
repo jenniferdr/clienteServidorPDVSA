@@ -5,9 +5,9 @@
 # antes de svc_run(); colocar: tareas_servidor(argc,argv);
 
 # Compilar (Hacer Makefile)
-gcc servicioPDVSA_server.c servicioPDVSA_svc.c funciones.c tareasServidor.c -pthread -o centro
+gcc servicioPDVSA_server.c servicioPDVSA_svc.c funciones.c md5c.c tareasServidor.c -pthread -o centro
 
-gcc cliente.c servicioPDVSA_clnt.c funciones.c -pthread -o bomba
+gcc cliente.c servicioPDVSA_clnt.c funciones.c md5c.c -pthread -o bomba
 
 # Para escuchar por el puerto 111
 #sudo rpcbind &

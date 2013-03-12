@@ -52,7 +52,7 @@ char **pedir_gasolina_1_svc(char ** bomba, struct svc_req *rqstp)
 
 int *pedir_tiempo_1_svc(void *argp, struct svc_req *rqstp)
 {
-   
+  printf("client address: %u", rqstp->rq_xprt->xp_raddr.sin_addr.s_addr);
   return &tiempo_respuesta;
 }
 
@@ -63,12 +63,23 @@ int *pedir_reto_1_svc(void *argp, struct svc_req *rqstp)
   time_t reloj;
   time (&reloj);
   srand((unsigned int ) reloj);
-  // encriptar la variable reloj 
+  // encriptar la variable reloj
+  
   // Buscar el ticket del cliente por su ip (en el arreglo de tickets) 
   // alli guardar la respuesta del reto en ticket[bla].reto
  
   numeroRn = (int) reloj;
   printf("numero real %d \n",numeroRn);
+
+  // convertir el numero a string
+  char *numero = (char *) malloc(sizeof(char)*10);
+  sprintf(numero,"%d",numeroRn);
+  
+  unsigned char *resultado= (unsigned char *) malloc(sizeof(unsigned char)*16);  
+  // Esto encripta una cadena de caracteres 
+  //MDString (numero,resultado);
+  //MDPrint (resultado);
+  
   return &numeroRn;
 }
 
@@ -78,8 +89,8 @@ int *enviar_respuesta_1_svc(char ** resp, struct svc_req *rqstp)
   int ip;
   printf("respuesta %s \n", *resp);
   // buscamos el ips del cliente
-
-  // donde debemos llenar este arreglo de ips??
+ 
+  // donde debemos llenar este arreglo de ips?? Jenni- inicializ en tareasSer..
   // Se agregan las ips cada vez q se crea el ticket en pedir_gasolina
   while (ips[i]!=ip && i < 99){
     i = i+1;

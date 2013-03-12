@@ -265,3 +265,44 @@ void swap(int *a , int *b){
   *b = aux;
 }
 
+/* Copyright (C) 1990-2, RSA Data Security, Inc. Created 1990. All
+rights reserved.
+
+RSA Data Security, Inc. makes no representations concerning either
+the merchantability of this software or the suitability of this
+software for any particular purpose. It is provided "as is"
+without express or implied warranty of any kind.
+
+These notices must be retained in any copies of any part of this
+documentation and/or software.
+ */
+
+/* Digests a string and prints the result.
+ */
+static void MDString (string,digest)
+char *string;
+unsigned char *digest;
+{
+  MD5_CTX context;
+  //unsigned char digest[16];
+  unsigned int len = strlen (string);
+
+  MDInit (&context);
+  MDUpdate (&context, string, len);
+  MDFinal (digest, &context);
+
+  printf ("MD5 (\"%s\") = ", string);
+  MDPrint (digest);
+  printf ("\n");
+}
+
+/* Prints a message digest in hexadecimal.
+ */
+static void MDPrint (digest)
+unsigned char digest[16];
+{
+  unsigned int i;
+
+  for (i = 0; i < 16; i++)
+ printf ("%02x", digest[i]);
+}
