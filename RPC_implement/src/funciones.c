@@ -99,7 +99,7 @@ void obtener_argumentos_servidor (int num,char ** arreglo, char* nombr, int *inv
 
   int op;
   bool cp = false;
-  if (num !=12){
+  if (num !=11){
     perror( "Sintaxis Incorrecta");
     opciones_servidor(); 
     exit(-1);
