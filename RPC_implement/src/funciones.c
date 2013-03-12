@@ -40,7 +40,7 @@ void argumentos_cliente (int numArg,char ** arreglo, char* nombr, int *inve,
   int op;
 
   if (numArg !=11){
-    perror( "Sintaxis Incorrecta \n");
+    printf( "Sintaxis Incorrecta \n");
     opciones_cliente();
     exit(-1);
     
@@ -100,7 +100,7 @@ void obtener_argumentos_servidor (int num,char ** arreglo, char* nombr, int *inv
   int op;
   bool cp = false;
   if (num !=11){
-    perror( "Sintaxis Incorrecta");
+    printf( "Sintaxis Incorrecta \n");
     opciones_servidor(); 
     exit(-1);
   }else{
@@ -174,7 +174,7 @@ void obtener_argumentos_servidor (int num,char ** arreglo, char* nombr, int *inv
 /* Lee del archivo DNS la informacion correspondiente*/
 /* en los arreglos repectivos*/
 int obtener_lista_dns(char *filename,char ** nombre, 
-		      char **direcciones, int *puertos ){
+		      char **direcciones/*,int *puertos*/ ){
    
   FILE *file = fopen ( filename, "r" ); 
   char *t;
@@ -225,10 +225,10 @@ int obtener_lista_dns(char *filename,char ** nombre,
 	  strcpy(direcciones[i],t);
 	  
 	}
-	if (j==2){
+	/*if (j==2){
 	  
 	  puertos[i]=atoi(t); 
-	}
+	  }*/
 	j=j+1;
 	t = strtok (NULL, "&\n");
       }
@@ -237,7 +237,7 @@ int obtener_lista_dns(char *filename,char ** nombre,
     }
     
     free(t);
-    puertos[i]=0;
+    //puertos[i]=0;
     direcciones[i]= NULL;
     nombre[i]=NULL;
     fclose ( file );

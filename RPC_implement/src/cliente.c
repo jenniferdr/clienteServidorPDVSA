@@ -53,10 +53,10 @@ int main(int argc, char *argv[]){
   char* nombres[MAX_SERVERS];
   char* direcciones[MAX_SERVERS];
   CLIENT *clnts[MAX_SERVERS];
-  int puertos[MAX_SERVERS];
+  //int puertos[MAX_SERVERS];
   int tiempos[MAX_SERVERS];
   argumentos_cliente(argc,argv,nombre,&inventario,&consumo,&capMax,archivo);
-  obtener_lista_dns(archivo, nombres,direcciones,&puertos[0]);
+  obtener_lista_dns(archivo, nombres,direcciones/*,&puertos[0]*/);
  
   // creacion del archivo LOG del cliente
   char nombre_LOG[MAX_LONG];
@@ -108,7 +108,7 @@ int main(int argc, char *argv[]){
     swap(&tiempos[i],&tiempos[minimo]);
     swapLetras(&nombres[i],&nombres[minimo]);
     swapLetras(&direcciones[i],&direcciones[minimo]);
-    swap(&puertos[i],&puertos[minimo]);
+    //swap(&puertos[i],&puertos[minimo]);
     i=i+1;
   }
  
@@ -121,6 +121,7 @@ int main(int argc, char *argv[]){
  
   /**** INICIO DE LA SIMULACION ****/ 
   int r = 0;
+
   /*
   char * encriptado1= "reto"; 
   printf("aquiii %s\n",encriptado1);
@@ -129,6 +130,7 @@ int main(int argc, char *argv[]){
   */
   //printf("numero %d",*nuRandom1);
   //printf("hoooooooola %s \n", &encriptado1);
+
   while (tiempo <= 480){
     //Iterar sobre los servidores "direcciones[r]" pidiendo gasolina
     
@@ -159,23 +161,27 @@ int main(int argc, char *argv[]){
 		tiempo, nombres[r],inventario);
 	r = r + 1; 
 	continue;
-	// ver si su ticket esta vigente 
-      } else if (strcmp(gasolina,"noTicket")==0){
-	int *nuRandom = pedir_reto_1(NULL,clnts[r]);
-	 char * encriptado= "reto"; 
-	 // debo encriptar es *nuRandom
-	 // encriptado = encriptarlo 
-	 
-	 int *respuesta = enviar_respuesta_1(&encriptado, clnts[r] );
-	 if ( respuesta == (int *)NULL){
-	   printf("error a autentificarse");
-	   // que hacemos volvemos a intentar???
-	 }
-	 else{
-	   continue;
-	   // para pedir gasolina de nuevo
-	 } 
 
+	// si su ticket no esta vigente 
+      } else if ( strcmp(gasolina,"noTicket") == 0 ){
+	int *nuRandom = pedir_reto_1(NULL,clnts[r]);
+	char *encriptado= "reto"; // No se esta reservando espacio para guardar los chars OJO 
+	// debo encriptar es *nuRandom
+	// encriptado = encriptarlo 
+	 
+	int *respuesta = enviar_respuesta_1(&encriptado, clnts[r] );
+	if ( respuesta == (int *)NULL){
+	  printf("error al autentificarse");
+	  // que hacemos volvemos a intentar??? Mmm si lo volvemos a intentar se quedaria pegado no?
+	  // PONER EN EL LOG AUTENTICACION FALLIDA
+	  r = r + 1;
+	  continue;
+	}else{
+	  continue;
+	  // para pedir gasolina de nuevo
+	  // PONER EN EL LOG AUTENTICACION CORRECTA
+	} 
+	
       } else {
 	fprintf(LOG,"Peticion: %d minutos, %s, OK, %d litros  \n",
 		tiempo, nombres[r],inventario);
