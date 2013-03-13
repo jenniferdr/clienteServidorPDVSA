@@ -21,6 +21,21 @@
 #define MAX_CONCURR 128
 
 
+// Para MD5
+
+#include <time.h>
+#include "global.h"
+#include "md5.h"
+
+#define MD5_CTX MD5_CTX
+#define MDInit MD5Init
+#define MDUpdate MD5Update
+#define MDFinal MD5Final
+
+
+static void MDString (char * string ,unsigned char * result);
+static void MDPrint (unsigned char digest[16]);
+
 /*
  * Muestra por pantalla la sintaxis correcta para 
  * llamar al programa cliente (Bomba).
