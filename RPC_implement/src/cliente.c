@@ -2,7 +2,7 @@
  * Simulación de una bomba de gasolina que se encarga
  * de surtir gasolina a sus clientes y cuando tiene 
  * espacio suficiente para llenar nuevamente su tanque 
- * hace una peticion al servidor para llenarlo.
+ * hace una peticion al servidor para llenarlo.o
  *
  * Autores: Juliana Leon 
  *          Jennifer Dos Reis

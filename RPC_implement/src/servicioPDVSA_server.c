@@ -11,13 +11,8 @@ extern int tiempo_respuesta;
 extern int inventario;
 extern pthread_mutex_t mutex;
 extern FILE *LOG;
-
+extern struct ticket tickets;
 int numeroRn;
-char *retos[100];
-int ips[100];
-int cuota[100];
-
-
 char **pedir_gasolina_1_svc(char ** bomba, struct svc_req *rqstp)
 { // MODIFICAR
   // Primero agregar un argumento para q el cliente de su ip
@@ -53,6 +48,11 @@ char **pedir_gasolina_1_svc(char ** bomba, struct svc_req *rqstp)
 int *pedir_tiempo_1_svc(void *argp, struct svc_req *rqstp)
 {
   printf("client address: %u", rqstp->rq_xprt->xp_raddr.sin_addr.s_addr);
+  int k=0;
+  // while (tickets[k].ip ==-1){
+    k=k+1;
+    // }
+  //  tickets[k].ip = rqstp->rq_xprt->xp_raddr.sin_addr.s_addr; 
   return &tiempo_respuesta;
 }
 
@@ -92,9 +92,9 @@ int *enviar_respuesta_1_svc(char ** resp, struct svc_req *rqstp)
  
   // donde debemos llenar este arreglo de ips?? Jenni- inicializ en tareasSer..
   // Se agregan las ips cada vez q se crea el ticket en pedir_gasolina
-  while (ips[i]!=ip && i < 99){
-    i = i+1;
-  }
+  // while (ips[i]!=ip && i < 99){
+  //i = i+1;
+  //}
   // puede ser 99 o NULL creo mejor NULL o -1 pero hay que inicializar
   // Podemos usar la constante MAX_SERVERS
   if (i==99){
@@ -102,16 +102,16 @@ int *enviar_respuesta_1_svc(char ** resp, struct svc_req *rqstp)
     return (0);// retonnar codigo de error
   }
   // comparar la respuesta que nos dio el cliente 
-  if( retos[i]== *resp /* No comparar asi, con strcomp*/ ){
+  // if( retos[i]== *resp /* No comparar asi, con strcomp*/ ){
     // como la respuesta fue correcta otorgo un ticket
-    cuota[i]= tiempo_actual + 5 ;
+    //cuota[i]= tiempo_actual + 5 ;
    
-    printf("renovado el ticket del cliente %d",ips[i]);
-  } else {
+  // printf("renovado el ticket del cliente %d",ips[i]);
+    // } else {
     // enviar codigo entero de error pues no coninciden claves
     printf("no coinciden claves");
     return (0);// retornar codigo de error
-  }
+    // }
  
   // Xq se retorna 0 en ambos casos ?
   return (0);

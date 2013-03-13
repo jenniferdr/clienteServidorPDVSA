@@ -1,6 +1,14 @@
 
 #include "tareasServidor.h"
 
+// Structura para guardar los tickets
+struct ticket {
+  int ip;
+  int cuota;
+  char *reto;
+};
+
+
 int inventario;    // Inventario actual
 int capMax;        // Capacidad Máxima (Litros)
 int tiempo_actual; // minutos
@@ -9,6 +17,7 @@ FILE *LOG;         // Archivo para la bitacora del servidor
 pthread_mutex_t mutex; // mutex sobre el inventario
 int tiempo_respuesta; 
 
+struct ticket tickets [MAX_SERVERS];
 /* Hilo encargado de actualizar tiempo e inventario
  * Recibe un apuntador a una variable entera(tiempo)
  */
@@ -20,6 +29,7 @@ void *llevar_tiempo(void *arg_tiempo){
     
     usleep(100000);
     *tiempo= *tiempo +1;
+  
 
     pthread_mutex_lock(&mutex);
     if(inventario+suministro<capMax){
@@ -35,7 +45,16 @@ void *llevar_tiempo(void *arg_tiempo){
 }
 
 void tareas_servidor(int argc, char **argv){
+  
+  int k=0;
+  while (k<MAX_SERVERS){
+    tickets[k].cuota = -1;  
+    tickets[k].ip= -1;
+   
+  k=k+1;
 
+  }
+  
   char nombre_centro[MAX_LONG];
   
   obtener_argumentos_servidor(argc,argv,nombre_centro,&inventario, 
