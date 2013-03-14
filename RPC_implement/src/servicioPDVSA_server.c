@@ -13,6 +13,8 @@ extern pthread_mutex_t mutex;
 extern FILE *LOG;
 extern struct ticket tickets;
 int numeroRn;
+
+
 char **pedir_gasolina_1_svc(char ** bomba, struct svc_req *rqstp)
 { // MODIFICAR
   // Primero agregar un argumento para q el cliente de su ip
@@ -50,7 +52,7 @@ int *pedir_tiempo_1_svc(void *argp, struct svc_req *rqstp)
   printf("client address: %u", rqstp->rq_xprt->xp_raddr.sin_addr.s_addr);
   int k=0;
   // while (tickets[k].ip ==-1){
-    k=k+1;
+  k=k+1; // tener cuidado. si ya ninguno es igual a -1 ? 
     // }
   //  tickets[k].ip = rqstp->rq_xprt->xp_raddr.sin_addr.s_addr; 
   return &tiempo_respuesta;
@@ -77,8 +79,8 @@ int *pedir_reto_1_svc(void *argp, struct svc_req *rqstp)
   
   unsigned char *resultado= (unsigned char *) malloc(sizeof(unsigned char)*16);  
   // Esto encripta una cadena de caracteres 
-  //MDString (numero,resultado);
-  //MDPrint (resultado);
+  MDString(numero,resultado);
+  MDPrint(resultado);
   
   return &numeroRn;
 }
