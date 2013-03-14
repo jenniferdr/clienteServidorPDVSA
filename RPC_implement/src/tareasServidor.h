@@ -7,12 +7,6 @@
 
 #include "funciones.h"
 
-//extern tiempo_actual;
-//extern tiempo_respuesta;
-//extern inventario;
-//extern pthread_mutex mutex;
-//extern LOG;
-
 void tareas_servidor(int argc, char **argv);
 
 #endif

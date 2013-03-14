@@ -33,8 +33,11 @@
 #define MDUpdate MD5Update
 #define MDFinal MD5Final
 
-static void MDString (char * string ,unsigned char * result);
-static void MDPrint (unsigned char digest[16]);
+
+
+void MDString (char * string ,unsigned char * result);
+void MDPrint (unsigned char digest[16]);
+
 
 /*
  * Muestra por pantalla la sintaxis correcta para 

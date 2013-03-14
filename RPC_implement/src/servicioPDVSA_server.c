@@ -13,10 +13,10 @@ extern FILE *LOG;
 //extern struct ticket *tickets[MAX_SERVERS];
 int numeroRn;
 
+
 extern int ips[MAX_SERVERS];
 extern int cuotas [MAX_SERVERS];
 extern char *retos[MAX_SERVERS];
-
 
 char **pedir_gasolina_1_svc(char ** bomba, struct svc_req *rqstp)
 { 
@@ -72,6 +72,7 @@ int *pedir_tiempo_1_svc(void *argp, struct svc_req *rqstp)
 
   // SI se cambia los arreglos a estructuras aqui hay que cambiar
   printf("client address: %u", rqstp->rq_xprt->xp_raddr.sin_addr.s_addr);
+
   int k = 0;
   while (ips[k] ==-1){
     k=k+1;

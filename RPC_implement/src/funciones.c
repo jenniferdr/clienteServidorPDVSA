@@ -279,9 +279,7 @@ documentation and/or software.
 
 /* Digests a string and prints the result.
  */
-static void MDString (string,digest)
-char *string;
-unsigned char *digest;
+void MDString (char *string,unsigned char *digest)
 {
   MD5_CTX context;
   //unsigned char digest[16];
@@ -298,8 +296,7 @@ unsigned char *digest;
 
 /* Prints a message digest in hexadecimal.
  */
-static void MDPrint (digest)
-unsigned char digest[16];
+void MDPrint (unsigned char digest[16])
 {
   unsigned int i;
 
