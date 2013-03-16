@@ -16,23 +16,21 @@ int numeroRn;
 
 extern int ips[MAX_SERVERS];
 extern int cuotas [MAX_SERVERS];
-extern char *retos[MAX_SERVERS];
+extern unsigned char *retos[MAX_SERVERS];
 
 char **pedir_gasolina_1_svc(char ** bomba, struct svc_req *rqstp)
 { 
   int i =0 ;
-  while (ips[i]!=rqstp->rq_xprt->xp_raddr.sin_addr.s_addr || ips[i]!=-1){
-    i = i+1;
+  while (i < MAX_SERVERS){
+    if (ips[i]==rqstp->rq_xprt->xp_raddr.sin_addr.s_addr){
+      break;
+    }
+    i=i+1;
   }
- 
-  if (ips[i]==-1){
-    printf("error el cliente no se escuentra");
-    return (0);// retonnar codigo de error
-  }
-  
+   
+  // VERIFICAR SI EL CLIENTE SE ENCONTRO DE VERDAD O NO ESTABA EN EL ARREGLO
 
-  // MODIFICAR
-  // Primero agregar un argumento para q el cliente de su ip
+
 
   // 1. Buscar el ticket del cliente por su ip
   //    Si no existe retornarle al cliente el string "noTicket"
@@ -42,27 +40,28 @@ char **pedir_gasolina_1_svc(char ** bomba, struct svc_req *rqstp)
   static char *result;
   result= (char *) malloc(sizeof(char)*20);
   
- if (cuotas[i] < tiempo_actual){
-   result = "noTicket";
-     
+  if (cuotas[i] < tiempo_actual){
+    result = "noTicket";
+    printf(" NO TENGO TICKETS \n"); 
   }
- else {
-  // Verificar si hay disponibilidad
-  pthread_mutex_lock(&mutex);
-  if( inventario >= 38000 ){
-    inventario= inventario - 38000;
-    if(inventario==0)fprintf(LOG,"Tanque vacío: %d minutos \n",tiempo_actual);
-    strcpy(result,"enviando");
-    fprintf(LOG,"Suministro: %d minutos, %s, OK, %d litros \n"
-	    ,tiempo_actual,*bomba,inventario);
-  }else{
-    printf("Centro con inventario insuficiente \n");
-    fprintf(LOG,"Suministro: %d minutos, %s, No disponible, %d litros \n"
-	    ,tiempo_actual,*bomba,inventario);
-    strcpy(result,"noDisponible");
+  else {
+    printf("TENGO TICKETS \n");
+    // Verificar si hay disponibilidad
+    pthread_mutex_lock(&mutex);
+    if( inventario >= 38000 ){
+      inventario= inventario - 38000;
+      if(inventario==0)fprintf(LOG,"Tanque vacío: %d minutos \n",tiempo_actual);
+      strcpy(result,"enviando");
+      fprintf(LOG,"Suministro: %d minutos, %s, OK, %d litros \n"
+	      ,tiempo_actual,*bomba,inventario);
+    }else{
+      printf("Centro con inventario insuficiente \n");
+      fprintf(LOG,"Suministro: %d minutos, %s, No disponible, %d litros \n"
+	      ,tiempo_actual,*bomba,inventario);
+      strcpy(result,"noDisponible");
+    }
+    pthread_mutex_unlock(&mutex);
   }
-  pthread_mutex_unlock(&mutex);
- }
 
   return &(result);
 }
@@ -72,13 +71,16 @@ int *pedir_tiempo_1_svc(void *argp, struct svc_req *rqstp)
 
   // SI se cambia los arreglos a estructuras aqui hay que cambiar
   printf("client address: %u", rqstp->rq_xprt->xp_raddr.sin_addr.s_addr);
-
+  
   int k = 0;
-  while (ips[k] ==-1){
+  while (k < MAX_SERVERS){
+    if (ips[k]==-1){
+       ips[k] = rqstp->rq_xprt->xp_raddr.sin_addr.s_addr; 
+       break;
+    }
     k=k+1;
   }
-  
-  ips[k] = rqstp->rq_xprt->xp_raddr.sin_addr.s_addr; 
+  //  printf("ip guardado %d \n", ips[k]);
   return &tiempo_respuesta;
 }
 
@@ -102,43 +104,53 @@ int *pedir_reto_1_svc(void *argp, struct svc_req *rqstp)
   unsigned char *resultado= (unsigned char *) malloc(sizeof(unsigned char)*16);  
   // Esto encripta una cadena de caracteres 
   MDString (numero,resultado);
-  // MDPrint (resultado);
+  //MDPrint (resultado);
 
   // Buscar el ticket del cliente por su ip (en el arreglo de tickets) 
-  int k=0;
-  while (ips[k]!=rqstp->rq_xprt->xp_raddr.sin_addr.s_addr)
+  int k = 0;
+  while (k < MAX_SERVERS){
+    if (ips[k]==rqstp->rq_xprt->xp_raddr.sin_addr.s_addr ){
+      retos[k]= resultado;
+      //  MDPrint (retos[k]);
+      //strcpy (retos[k],resultado); // encriptado
+      break;
+    }
     k=k+1;
-  strcpy (retos[k],numero); // encriptado
-
-  // alli guardar la respuesta del reto en ticket[bla].reto
-  
+  }
+       
   return &numeroRn;
 }
 
 int *enviar_respuesta_1_svc(char ** resp, struct svc_req *rqstp)
 {
-  int u = -1;
+  int u =0;
   int i = 0;
   int ip;
-  printf("respuesta %s \n", *resp);
+  unsigned char *result= (unsigned char *) malloc(sizeof(unsigned char)*16);   
+ 
+  sprintf(result,"%s",*resp);
+  
+  MDPrint (result);
+  printf("\n");
+  MDPrint (retos[0]);
+
+  printf("\n");
+  //printf("respuesta %s \n", *resp);
   //buscamos el ips del cliente
-  while (ips[i]!=rqstp->rq_xprt->xp_raddr.sin_addr.s_addr || ips[i]!=-1){
-    i = i+1;
+  while (i < MAX_SERVERS){
+    if (ips[i]==rqstp->rq_xprt->xp_raddr.sin_addr.s_addr ){
+      if( strcmp (retos[i], result) == 0){
+	printf("COINCIDEN LAS CLAVES");
+	cuotas[i]= tiempo_actual + 5 ;
+	break;
+      } else {
+	printf("no coinciden claves");
+	u = -1;
+	break;
+      }
+    }
+    i =i +1;
   }
- 
-  if (ips[i]==-1){
-    printf("error el cliente no se escuentra");
-    return (0);// retonnar codigo de error
-  }
-  // comparar la respuesta que nos dio el cliente 
-  if( strcmp (retos[i], *resp) == 0){
-    cuotas[i]= tiempo_actual + 5 ;
-  } else {
-    // enviar codigo entero de error pues no coninciden claves
-    printf("no coinciden claves");
-    return (0);// retornar codigo de error
-  }
- 
-  // Xq se retorna 0 en ambos casos ?
-  return (0);
+  // VEr si de verdad esta enviendo -1
+  return &(u);
 }

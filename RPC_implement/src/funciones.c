@@ -289,9 +289,9 @@ void MDString (char *string,unsigned char *digest)
   MDUpdate (&context, string, len);
   MDFinal (digest, &context);
 
-  printf ("MD5 (\"%s\") = ", string);
-  MDPrint (digest);
-  printf ("\n");
+  //  printf ("MD5 (\"%s\") = ", string);
+  //MDPrint (digest);
+  //printf ("\n");
 }
 
 /* Prints a message digest in hexadecimal.
