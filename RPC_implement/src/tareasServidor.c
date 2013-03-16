@@ -49,13 +49,13 @@ void *llevar_tiempo(void *arg_tiempo){
 
 void tareas_servidor(int argc, char **argv){
   
-  int k=0;
-  while (k<MAX_SERVERS){
+  int ka = 0;
+  while (ka<MAX_SERVERS){
     // tickets[k].cuota = -1;  
     //tickets[k].ip= -1;
-    cuotas[k]=-1;
-    ips[k]=-1;
-    k=k+1;
+    cuotas[ka]=-1;
+    ips[ka]=-1;
+    ka=ka+1;
 
   }
   
