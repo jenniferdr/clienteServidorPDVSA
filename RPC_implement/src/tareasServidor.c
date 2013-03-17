@@ -81,6 +81,7 @@ void tareas_servidor(int argc, char **argv){
     //tickets[k].ip= -1;
     cuotas[ka]=-1;
     ips[ka]=-1;
+    retos[ka]== NULL;
     ka=ka+1;
   }
    

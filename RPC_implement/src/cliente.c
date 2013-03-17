@@ -176,12 +176,15 @@ int main(int argc, char *argv[]){
 	 printf("El unsigned char se envió como: \n");
 	 MDPrint (respUChar);
 	 printf("\n");
+	 printf("Y si lo imprimo como string es : \n");
+	 printf("%s \n",respUChar);
 	 
 	 char *respStr;
 	 respStr = (char *) respUChar;
 	 
 	 int *resp = enviar_respuesta_1(&respStr, clnts[r]);
  
+	 // Y si es NULL ?
 	 if ( *resp == -1){
 	   printf("error al autentificarse");
 

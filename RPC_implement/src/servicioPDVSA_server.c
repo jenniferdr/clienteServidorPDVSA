@@ -22,7 +22,7 @@ extern unsigned char *retos[MAX_SERVERS];
 char **pedir_gasolina_1_svc(char ** bomba, struct svc_req *rqstp)
 { 
   int i =0 ;
-  while (i < MAX_SERVERS){
+  while (i < MAX_SERVERS && ips[i]!= -1){
     if (ips[i]==rqstp->rq_xprt->xp_raddr.sin_addr.s_addr){
       break;
     }
@@ -69,12 +69,11 @@ char **pedir_gasolina_1_svc(char ** bomba, struct svc_req *rqstp)
 
 int *pedir_tiempo_1_svc(void *argp, struct svc_req *rqstp)
 {
-
-  // SI se cambia los arreglos a estructuras aqui hay que cambiar
   printf("client address: %u", rqstp->rq_xprt->xp_raddr.sin_addr.s_addr);
   
   int k = 0;
   while (k < MAX_SERVERS){
+    // Y si ya esta lleno el arreglo de tickets ?
     if (ips[k]==-1){
        ips[k] = rqstp->rq_xprt->xp_raddr.sin_addr.s_addr; 
        break;
@@ -94,8 +93,8 @@ int *pedir_reto_1_svc(void *argp, struct svc_req *rqstp)
   srand((unsigned int ) reloj);
   // encriptar la variable reloj
   
- 
-  numeroRn = (int) reloj;
+  numeroRn= 5;
+  //numeroRn = (int) reloj;
   printf("numero real %d \n",numeroRn);
 
   // convertir el numero a string
@@ -105,7 +104,10 @@ int *pedir_reto_1_svc(void *argp, struct svc_req *rqstp)
   unsigned char *resultado= (unsigned char *) malloc(sizeof(unsigned char)*16);  
   // Esto encripta una cadena de caracteres 
   MDString (numero,resultado);
-  //MDPrint (resultado);
+  printf("Cuando genero el reto el mdprint es : \n");
+  MDPrint (resultado);
+  printf("Y si lo imprimo como string es : \n");
+  printf("%s \n",resultado);
 
   // Buscar el ticket del cliente por su ip (en el arreglo de tickets) 
   int k = 0;
@@ -124,36 +126,39 @@ int *pedir_reto_1_svc(void *argp, struct svc_req *rqstp)
 
 int *enviar_respuesta_1_svc(char ** resp, struct svc_req *rqstp)
 {
-  // Creo que hay que reservar memoria dinamica para la variable de retorno
   int *u =  malloc(sizeof(int));
   int i = 0;
   int ip;
   unsigned char *result= (unsigned char *) malloc(sizeof(unsigned char)*16);   
- //sprintf(result,"%s",*resp);
- memcpy(result, *resp, 16);
- printf("El unsigned char se recibió como: \n");
- MDPrint (result);
- printf("\n"); 
- MDPrint (retos[0]);
-
- printf("\n");
- //printf("respuesta %s \n", *resp);
- //buscamos el ips del cliente
- while (i < MAX_SERVERS){
-   if (ips[i]==rqstp->rq_xprt->xp_raddr.sin_addr.s_addr ){
-     if( strcmp (retos[i], result) == 0){
-       printf("COINCIDEN LAS CLAVES");
-       cuotas[i]= tiempo_actual + 5 ;
-       *u =0;
-       break;
-     } else {
-       printf("no coinciden claves");
+  //sprintf(result,"%s",*resp);
+  memcpy(result, *resp, 16);
+  printf("El unsigned char se recibió como: \n");
+  MDPrint (result);
+  printf("\n"); 
+  //MDPrint (retos[0]);
+  
+  printf("\n");
+  //printf("respuesta %s \n", *resp);
+  //buscamos el ip del cliente
+  while (i < MAX_SERVERS){
+    if (ips[i]==rqstp->rq_xprt->xp_raddr.sin_addr.s_addr ){
+      MDPrint (retos[i]);
+      printf("\n Y en string son: \n");
+      printf("%s\n",retos[i]);
+      printf("%s\n",result);
+      if( strcmp (retos[i], result) == 0){
+	printf("COINCIDEN LAS CLAVES");
+	cuotas[i]= tiempo_actual + 5 ;
+	*u =0;
+	break;
+      } else {
+	printf("no coinciden claves");
 	*u = -1;
 	break;
-     }
-   }
-   i =i +1;
- }
- // VEr si de verdad esta enviendo -1
- return (u);
+      }
+    }
+    i =i +1;
+  }
+  // VEr si de verdad esta enviendo -1
+  return (u);
 }
