@@ -1,4 +1,3 @@
-
 #include "servicioPDVSA.h"
 #include "tareasServidor.h"
 #include <time.h>
@@ -131,7 +130,7 @@ int *enviar_respuesta_1_svc(char ** resp, struct svc_req *rqstp)
   sprintf(result,"%s",*resp);
   
   MDPrint (result);
-  printf("\n");
+  printf("\n"); 
   MDPrint (retos[0]);
 
   printf("\n");
