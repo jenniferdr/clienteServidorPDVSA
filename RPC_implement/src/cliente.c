@@ -182,7 +182,7 @@ int main(int argc, char *argv[]){
 	 
 	 int *resp = enviar_respuesta_1(&respStr, clnts[r]);
  
-	 if ( resp == (int *)NULL){
+	 if ( *resp == -1){
 	   printf("error al autentificarse");
 
 	   // PONER EN EL LOG AUTENTICACION FALLIDA

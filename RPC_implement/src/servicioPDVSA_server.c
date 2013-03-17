@@ -1,6 +1,8 @@
 #include "servicioPDVSA.h"
 #include "tareasServidor.h"
 #include <time.h>
+#include <string.h>
+#include <stdio.h>
 /* Variables globales que se encuentran definidas
  * e inicializadas en "tareasServidor.h"
  */
@@ -123,35 +125,35 @@ int *pedir_reto_1_svc(void *argp, struct svc_req *rqstp)
 int *enviar_respuesta_1_svc(char ** resp, struct svc_req *rqstp)
 {
   // Creo que hay que reservar memoria dinamica para la variable de retorno
-  int u =0;
+  int *u =  malloc(sizeof(int));
   int i = 0;
   int ip;
   unsigned char *result= (unsigned char *) malloc(sizeof(unsigned char)*16);   
- 
-  sprintf(result,"%s",*resp);
-  
-  printf("El unsigned char se recibió como: \n");
-  MDPrint (result);
-  printf("\n"); 
-  MDPrint (retos[0]);
+ //sprintf(result,"%s",*resp);
+ memcpy(result, *resp, 16);
+ printf("El unsigned char se recibió como: \n");
+ MDPrint (result);
+ printf("\n"); 
+ MDPrint (retos[0]);
 
-  printf("\n");
-  //printf("respuesta %s \n", *resp);
-  //buscamos el ips del cliente
-  while (i < MAX_SERVERS){
-    if (ips[i]==rqstp->rq_xprt->xp_raddr.sin_addr.s_addr ){
-      if( strcmp (retos[i], result) == 0){
-	printf("COINCIDEN LAS CLAVES");
-	cuotas[i]= tiempo_actual + 5 ;
+ printf("\n");
+ //printf("respuesta %s \n", *resp);
+ //buscamos el ips del cliente
+ while (i < MAX_SERVERS){
+   if (ips[i]==rqstp->rq_xprt->xp_raddr.sin_addr.s_addr ){
+     if( strcmp (retos[i], result) == 0){
+       printf("COINCIDEN LAS CLAVES");
+       cuotas[i]= tiempo_actual + 5 ;
+       *u =0;
+       break;
+     } else {
+       printf("no coinciden claves");
+	*u = -1;
 	break;
-      } else {
-	printf("no coinciden claves");
-	u = -1;
-	break;
-      }
-    }
-    i =i +1;
-  }
-  // VEr si de verdad esta enviendo -1
-  return &(u);
+     }
+   }
+   i =i +1;
+ }
+ // VEr si de verdad esta enviendo -1
+ return (u);
 }
