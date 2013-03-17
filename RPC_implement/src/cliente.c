@@ -4,6 +4,7 @@
  * espacio suficiente para llenar nuevamente su tanque 
  * hace una peticion al servidor para llenarlo.
  *
+ * Version 2.0 (Implementacion RPC)
  * Autores: Juliana Leon 
  *          Jennifer Dos Reis
  */
@@ -13,7 +14,7 @@
 #include <pthread.h>
 
 
-pthread_mutex_t mutex;
+pthread_mutex_t mutex; // mutex para la variable inventario
 int inventario;
 int consumo; // Consumo promedio (Litros*Minutos)
 FILE *LOG;
@@ -28,8 +29,8 @@ void *llevar_tiempo(void *arg_tiempo){
     usleep(100000);
     *tiempo= *tiempo +1;
     
-    pthread_mutex_lock(&mutex);
-    
+    // Actualizar inventario
+    pthread_mutex_lock(&mutex); // Seccion critica ==> Inventario
     if(inventario!=0){
       inventario = inventario-consumo;
       if(inventario<0)inventario=0;
@@ -120,28 +121,8 @@ int main(int argc, char *argv[]){
   int tiempo=0;
   pthread_create(&contador_tiempo,NULL,llevar_tiempo,&tiempo);
  
-  /**** INICIO DE LA SIMULACION ****/ 
-  
+  /**** INICIO DE LA SIMULACION ****/   
   int r = 0;
-
-  /*
-  int *nuRandom1 = pedir_reto_1(NULL,clnts[0]);
-  unsigned char *resultado= (unsigned char *) malloc(sizeof(unsigned char)*16);  
-  char *numero = (char *) malloc(sizeof(char)*10);
-  sprintf(numero,"%d",*nuRandom1);
-  
-  
-  MDString (numero,resultado);
-  MDPrint (resultado);
-  printf("\n");
-  char *resul;
- 
-  resul = (char *)resultado;
- 
-  int *nuRan = enviar_respuesta_1(&resul, clnts[0]);
-  */
-  
-  //printf("hoooooooola %s \n", nuRan);
 
   while (tiempo <= 480){
     //Iterar sobre los servidores "direcciones[r]" pidiendo gasolina
@@ -154,69 +135,80 @@ int main(int argc, char *argv[]){
 
     if ((capMax-inventario)>=38000){
 
-      // Verificar si el servidor r respondió al pedir tiempos
+      // Verificar si el servidor r no respondió al pedir tiempos
       if (tiempos[r] == 500){ 
 	r = r +1;
 	continue;
       }
 
+      // Pedir gasolina al servidor num r, almacenar respuesta en buffer gasolina
       char gasolina[20];
       char **result2 = pedir_gasolina_1( &nombre_pointer, clnts[r] );
       if ( result2 == (char **)NULL){
-	clnt_perror( clnts[k], "Error al conectar con servidor");
+	clnt_perror( clnts[r], "Error al conectar con servidor");
       }else{
 	strcpy(gasolina,*result2);
       }
       
+      // Procesar respuesta del servidor
       if (strcmp(gasolina,"noDisponible") == 0){
+
 	fprintf(LOG,"Peticion: %d minutos, %s , No disponible, %d litros \n",
 		tiempo, nombres[r],inventario);
+
+	// Pedir gasolina al siguiente servidor en la lista
 	r = r + 1; 
 	continue;
 
-	// si su ticket no esta vigente 
+	// si su ticket no esta vigente o no tiene ticket 
       } else if ( strcmp(gasolina,"noTicket") == 0 ){
 
-	 int *nuRandom1 = pedir_reto_1(NULL,clnts[0]);
-	 unsigned char *resultado= (unsigned char *) malloc(sizeof(unsigned char)*16);  
-	 char *numero = (char *) malloc(sizeof(char)*10);
-	 sprintf(numero,"%d",*nuRandom1);
-  
-  
-	 MDString (numero,resultado);
-	 MDPrint (resultado);
+	 int *retoInt = pedir_reto_1(NULL,clnts[r]);
+	 printf("El numero que recibí: %d \n",*retoInt);
+
+	 // convertir el reto de int a string
+	 char *retoStr = (char *) malloc(sizeof(char)*10);
+	 sprintf(retoStr,"%d",*retoInt);
+
+	 // Aplicar el algoritmo MD5
+	 unsigned char *respUChar= (unsigned char *) malloc(sizeof(unsigned char)*16);
+	 MDString (retoStr,respUChar);
+	 printf("El unsigned char se envió como: \n");
+	 MDPrint (respUChar);
 	 printf("\n");
-	 char *resul;
 	 
-	 resul = (char *)resultado;
+	 char *respStr;
+	 respStr = (char *) respUChar;
+	 
+	 int *resp = enviar_respuesta_1(&respStr, clnts[r]);
  
-	 int *resp = enviar_respuesta_1(&resul, clnts[0]);
- 
-	if ( resp == (int *)NULL){
-	  printf("error al autentificarse");
-	  // que hacemos volvemos a intentar??? Mmm si lo volvemos a intentar se quedaria pegado no?
-	  // PONER EN EL LOG AUTENTICACION FALLIDA
-	  r = r + 1;
-	  continue;
-	}else{
-	  continue;
-	  // para pedir gasolina de nuevo
-	  // PONER EN EL LOG AUTENTICACION CORRECTA
-	} 
-	
+	 if ( resp == (int *)NULL){
+	   printf("error al autentificarse");
+
+	   // PONER EN EL LOG AUTENTICACION FALLIDA
+	   r = r + 1;
+	   continue;
+	 }else{
+	   continue;
+	   // para pedir gasolina de nuevo
+	   // PONER EN EL LOG AUTENTICACION CORRECTA
+	 } 
+	 
       } else {
+	// El ticket aun sigue vigente =) . Esperar y recibir gasolina.
+
 	fprintf(LOG,"Peticion: %d minutos, %s, OK, %d litros  \n",
 		tiempo, nombres[r],inventario);
 	
 	usleep((tiempos[r]+1)*100000); 
-
+	
 	pthread_mutex_lock(&mutex);
 	inventario = inventario + 38000;
 	pthread_mutex_unlock(&mutex);
-
+	
 	fprintf(LOG,"Llegada Gandola: %d minutos, %d litros \n", tiempo,inventario);
 	if (inventario==capMax){ fprintf(LOG,"Tanque Full: %d minutos\n",tiempo);}
-
+	
 	// Reiniciar la busqueda de servidores activos
 	r = 0;
       } 

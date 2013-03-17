@@ -122,6 +122,7 @@ int *pedir_reto_1_svc(void *argp, struct svc_req *rqstp)
 
 int *enviar_respuesta_1_svc(char ** resp, struct svc_req *rqstp)
 {
+  // Creo que hay que reservar memoria dinamica para la variable de retorno
   int u =0;
   int i = 0;
   int ip;
@@ -129,6 +130,7 @@ int *enviar_respuesta_1_svc(char ** resp, struct svc_req *rqstp)
  
   sprintf(result,"%s",*resp);
   
+  printf("El unsigned char se recibió como: \n");
   MDPrint (result);
   printf("\n"); 
   MDPrint (retos[0]);

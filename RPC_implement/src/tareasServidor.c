@@ -1,5 +1,6 @@
 
 #include "tareasServidor.h"
+#include <rpc/rpc.h>
 
 // Structura para guardar los tickets
 struct ticket {
@@ -7,6 +8,8 @@ struct ticket {
   int cuota;
   char* reto;
 };
+
+// Estructuras para info de los tickets
 int ips[MAX_SERVERS];
 int cuotas [MAX_SERVERS];
 char *retos[MAX_SERVERS];
@@ -22,18 +25,22 @@ struct ticket tickets [MAX_SERVERS];
 
 
 /* Hilo encargado de actualizar tiempo e inventario
- * Recibe un apuntador a una variable entera(tiempo)
+ * Recibe un apuntador a una variable de tipo entero(tiempo)
  */
 void *llevar_tiempo(void *arg_tiempo){
-  pthread_detach(pthread_self());
-
+  
   int *tiempo= (int*) arg_tiempo;
+
   while(*tiempo<480){
-    
+
+    // Informar el tiempo cada 100 minutos
+    if(*tiempo%100 == 0)printf("tiempo : %d \n",*tiempo);
+
+    // Duerme un minuto y actualiza el tiempo 
     usleep(100000);
     *tiempo= *tiempo +1;
   
-
+    // Actualizar inventario
     pthread_mutex_lock(&mutex);
     if(inventario+suministro<capMax){
       inventario= inventario + suministro;
@@ -44,20 +51,13 @@ void *llevar_tiempo(void *arg_tiempo){
     pthread_mutex_unlock(&mutex);
 
   }
-  pthread_exit(0);
+
+  // Finalizar simulacion 
+  usleep(30000);
+  exit(0);
 }
 
 void tareas_servidor(int argc, char **argv){
-  
-  int ka = 0;
-  while (ka<MAX_SERVERS){
-    // tickets[k].cuota = -1;  
-    //tickets[k].ip= -1;
-    cuotas[ka]=-1;
-    ips[ka]=-1;
-    ka=ka+1;
-
-  }
   
   char nombre_centro[MAX_LONG];
   
@@ -73,7 +73,17 @@ void tareas_servidor(int argc, char **argv){
   if(inventario==0) fprintf(LOG,"Tanque vacio: 0 minutos \n");
   if(inventario==capMax) fprintf(LOG,"Tanque full: 0 minutos \n");
   fflush(LOG);
-  
+
+  // Inicializar arreglos de ticket
+  int ka = 0;
+  while (ka<MAX_SERVERS){
+    // tickets[k].cuota = -1;  
+    //tickets[k].ip= -1;
+    cuotas[ka]=-1;
+    ips[ka]=-1;
+    ka=ka+1;
+  }
+   
   // Iniciar contador de tiempo 
   pthread_t contador_tiempo;
   tiempo_actual=0;
