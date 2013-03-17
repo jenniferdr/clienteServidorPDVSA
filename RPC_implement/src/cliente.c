@@ -12,6 +12,7 @@
 #include "funciones.h"
 #include <pthread.h>
 
+
 pthread_mutex_t mutex;
 int inventario;
 int consumo; // Consumo promedio (Litros*Minutos)
@@ -20,15 +21,15 @@ FILE *LOG;
 // Hilo encargado de actualizar tiempo e inventario
 void *llevar_tiempo(void *arg_tiempo){
   pthread_detach(pthread_self());
-
+  
   int *tiempo= (int*) arg_tiempo;
   while(*tiempo<=480){
     
     usleep(100000);
     *tiempo= *tiempo +1;
-
+    
     pthread_mutex_lock(&mutex);
-
+    
     if(inventario!=0){
       inventario = inventario-consumo;
       if(inventario<0)inventario=0;
@@ -64,8 +65,8 @@ int main(int argc, char *argv[]){
   LOG = fopen(nombre_LOG,"w");
 
   fprintf(LOG,"Inventario inicial %d \n ", inventario);
-  if(inventario==0) fprintf(LOG,"Tanque vacio: 0 minutos \n");
-  if(inventario==capMax) fprintf(LOG,"Tanque full: 0 minutos \n");
+  if(inventario == 0) fprintf(LOG,"Tanque vacio: 0 minutos \n");
+  if(inventario == capMax) fprintf(LOG,"Tanque full: 0 minutos \n");
   
   // PEDIR TIEMPOS
   int k = 0;
@@ -120,43 +121,54 @@ int main(int argc, char *argv[]){
   pthread_create(&contador_tiempo,NULL,llevar_tiempo,&tiempo);
  
   /**** INICIO DE LA SIMULACION ****/ 
+  
   int r = 0;
 
   /*
-  char * encriptado1= "reto"; 
-  printf("aquiii %s\n",encriptado1);
-  printf("lo que mando %s\n",&encriptado1);
-  int *nuRandom1 = enviar_respuesta_1(&encriptado1, clnts[0]);
+  int *nuRandom1 = pedir_reto_1(NULL,clnts[0]);
+  unsigned char *resultado= (unsigned char *) malloc(sizeof(unsigned char)*16);  
+  char *numero = (char *) malloc(sizeof(char)*10);
+  sprintf(numero,"%d",*nuRandom1);
+  
+  
+  MDString (numero,resultado);
+  MDPrint (resultado);
+  printf("\n");
+  char *resul;
+ 
+  resul = (char *)resultado;
+ 
+  int *nuRan = enviar_respuesta_1(&resul, clnts[0]);
   */
-  //printf("numero %d",*nuRandom1);
-  //printf("hoooooooola %s \n", &encriptado1);
+  
+  //printf("hoooooooola %s \n", nuRan);
 
   while (tiempo <= 480){
     //Iterar sobre los servidores "direcciones[r]" pidiendo gasolina
     
     if(direcciones[r]==NULL){
       // Si llegamos al final de la lista, reiniciar.
-      r=0;
+      r = 0;
       usleep(100000);
     }
 
     if ((capMax-inventario)>=38000){
 
       // Verificar si el servidor r respondió al pedir tiempos
-      if (tiempos[r]==500){ 
+      if (tiempos[r] == 500){ 
 	r = r +1;
 	continue;
       }
 
       char gasolina[20];
-      char **result2= pedir_gasolina_1( &nombre_pointer, clnts[r] );
+      char **result2 = pedir_gasolina_1( &nombre_pointer, clnts[r] );
       if ( result2 == (char **)NULL){
 	clnt_perror( clnts[k], "Error al conectar con servidor");
       }else{
 	strcpy(gasolina,*result2);
       }
       
-      if (strcmp(gasolina,"noDisponible")==0){
+      if (strcmp(gasolina,"noDisponible") == 0){
 	fprintf(LOG,"Peticion: %d minutos, %s , No disponible, %d litros \n",
 		tiempo, nombres[r],inventario);
 	r = r + 1; 
@@ -164,13 +176,23 @@ int main(int argc, char *argv[]){
 
 	// si su ticket no esta vigente 
       } else if ( strcmp(gasolina,"noTicket") == 0 ){
-	int *nuRandom = pedir_reto_1(NULL,clnts[r]);
-	char *encriptado= "reto"; // No se esta reservando espacio para guardar los chars OJO 
-	// debo encriptar es *nuRandom
-	// encriptado = encriptarlo 
+
+	 int *nuRandom1 = pedir_reto_1(NULL,clnts[0]);
+	 unsigned char *resultado= (unsigned char *) malloc(sizeof(unsigned char)*16);  
+	 char *numero = (char *) malloc(sizeof(char)*10);
+	 sprintf(numero,"%d",*nuRandom1);
+  
+  
+	 MDString (numero,resultado);
+	 MDPrint (resultado);
+	 printf("\n");
+	 char *resul;
 	 
-	int *respuesta = enviar_respuesta_1(&encriptado, clnts[r] );
-	if ( respuesta == (int *)NULL){
+	 resul = (char *)resultado;
+ 
+	 int *resp = enviar_respuesta_1(&resul, clnts[0]);
+ 
+	if ( resp == (int *)NULL){
 	  printf("error al autentificarse");
 	  // que hacemos volvemos a intentar??? Mmm si lo volvemos a intentar se quedaria pegado no?
 	  // PONER EN EL LOG AUTENTICACION FALLIDA

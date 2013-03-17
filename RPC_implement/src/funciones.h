@@ -27,14 +27,17 @@
 #include "global.h"
 #include "md5.h"
 
+
 #define MD5_CTX MD5_CTX
 #define MDInit MD5Init
 #define MDUpdate MD5Update
 #define MDFinal MD5Final
 
 
+
 void MDString (char * string ,unsigned char * result);
 void MDPrint (unsigned char digest[16]);
+
 
 /*
  * Muestra por pantalla la sintaxis correcta para 

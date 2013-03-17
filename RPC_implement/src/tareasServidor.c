@@ -6,9 +6,13 @@
 struct ticket {
   int ip;
   int cuota;
-  char *reto;
+  char* reto;
 };
 
+// Estructuras para info de los tickets
+int ips[MAX_SERVERS];
+int cuotas [MAX_SERVERS];
+char *retos[MAX_SERVERS];
 
 int inventario;    // Inventario actual
 int capMax;        // Capacidad Máxima (Litros)
@@ -70,16 +74,16 @@ void tareas_servidor(int argc, char **argv){
   if(inventario==capMax) fprintf(LOG,"Tanque full: 0 minutos \n");
   fflush(LOG);
 
-  // Inicializar 
-  int k=0;
-  while (k<MAX_SERVERS){
-    tickets[k].cuota = -1;  
-    tickets[k].ip= -1;
-    
-    k=k+1;
-
+  // Inicializar arreglos de ticket
+  int ka = 0;
+  while (ka<MAX_SERVERS){
+    // tickets[k].cuota = -1;  
+    //tickets[k].ip= -1;
+    cuotas[ka]=-1;
+    ips[ka]=-1;
+    ka=ka+1;
   }
-  
+   
   // Iniciar contador de tiempo 
   pthread_t contador_tiempo;
   tiempo_actual=0;
