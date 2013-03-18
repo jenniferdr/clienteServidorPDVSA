@@ -37,7 +37,6 @@
 
 void MDString (char * string ,unsigned char * result);
 void MDPrint (unsigned char digest[16]);
-int compararUnsignedChar ( unsigned char uno[16], unsigned char dos[16]);
 
 /*
  * Muestra por pantalla la sintaxis correcta para 

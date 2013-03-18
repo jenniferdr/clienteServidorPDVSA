@@ -13,5 +13,5 @@ gcc cliente.c servicioPDVSA_clnt.c funciones.c md5c.c -pthread -o bomba
 #sudo rpcbind &
 
 # CORRER SERVIDOR Y CLIENTE
-# sudo ./centro -n C1 -cp 120000 -i 23 -t 50 -s 209 -p 10323
-# ./bomba –n Bomba -cp 200000 –i 50000 –c 200 –fc dominios
+# sudo ./centro -n C1 -cp 120000 -i 23 -t 50 -s 209
+# ./bomba -n Bomba -cp 200000 -i 50000 -c 200 -fc dns

@@ -54,7 +54,7 @@ int main(int argc, char *argv[]){
   // Datos de los servidores
   char* nombres[MAX_SERVERS];
   char* direcciones[MAX_SERVERS];
-  int tiempos[MAX_SERVERS];
+  int tiempos[MAX_SERVERS]; //tiempos de respuesta
   CLIENT *clnts[MAX_SERVERS];
 
   // Validar y obtener argumentos del cliente
@@ -112,13 +112,11 @@ int main(int argc, char *argv[]){
     swap(&tiempos[i],&tiempos[minimo]);
     swapLetras(&nombres[i],&nombres[minimo]);
     swapLetras(&direcciones[i],&direcciones[minimo]);
-    //swap(&puertos[i],&puertos[minimo]);
     i=i+1;
   }
  
 
   // Iniciar contador de tiempo 
-  
   pthread_t contador_tiempo;
   int tiempo=0;
   pthread_create(&contador_tiempo,NULL,llevar_tiempo,&tiempo);
@@ -178,19 +176,22 @@ int main(int argc, char *argv[]){
 	 printf("El unsigned char se envió como: \n");
 	 MDPrint (respUChar);
 	 printf("\n");
-	 printf("Y si lo imprimo como string es : \n");
-	 printf("%s \n",respUChar);
-	 
+	
 
 	 char *md5string= (char *) malloc(sizeof(char)*33);
 	 int i;
 	 for(i = 0; i < 16; ++i)
 	   sprintf(&md5string[i*2], "%02x", (unsigned int)respUChar[i]);
 
+	 printf("Y si lo imprimo como string es : \n");
+	 printf("%s \n",md5string);
+
 	 char *respStr;
 	 respStr = (char *) respUChar;
 	 
 	 int *resp = enviar_respuesta_1(&md5string, clnts[r]);
+	 //free(md5string);
+
 	 // FALTA VER SI LLEGA BIEN
 	 //printf("respuesta en enviar %d",*resp);
 	 

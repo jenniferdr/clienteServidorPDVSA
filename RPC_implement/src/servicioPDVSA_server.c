@@ -87,37 +87,33 @@ int *pedir_tiempo_1_svc(void *argp, struct svc_req *rqstp)
 
 int *pedir_reto_1_svc(void *argp, struct svc_req *rqstp)
 {
-  // El cliente deberia pasar su ip para poderlo identificar 
-
   time_t reloj;
   time (&reloj);
   srand((unsigned int ) reloj);
-  // encriptar la variable reloj
-  
-  numeroRn= 5;
-  //numeroRn = (int) reloj;
+  numeroRn = (int) reloj;
+
   printf("numero real %d \n",numeroRn);
 
   // convertir el numero a string
   char *numero = (char *) malloc(sizeof(char)*10);
   sprintf(numero,"%d",numeroRn);
   
-  unsigned char *resultado= (unsigned char *) malloc(sizeof(unsigned char)*16);  
-  // Esto encripta una cadena de caracteres 
-  MDString (numero,resultado);
+  // Aplicar el hash al reto
+  //unsigned char *resultado= (unsigned char *) malloc(sizeof(unsigned char)*16); 
+  unsigned char resultado[16];
+  MDString (numero,&resultado[0]);
+
   printf("Cuando genero el reto el mdprint es : \n");
+  MDPrint (&resultado[0]);
 
-
-
-  MDPrint (resultado);
-  //convirtiendo a string
+  // convirtiendo a string
   char *md5string= (char *) malloc(sizeof(char)*33);
   int i;
   for(i = 0; i < 16; ++i)
     sprintf(&md5string[i*2], "%02x", (unsigned int)resultado[i]);
 
   printf("Y si lo imprimo como string es : \n");
-  printf("%s \n",resultado);
+  printf("%s \n",md5string);
 
   // Buscar el ticket del cliente por su ip (en el arreglo de tickets) 
   int k = 0;
@@ -136,43 +132,46 @@ int *pedir_reto_1_svc(void *argp, struct svc_req *rqstp)
 
 int *enviar_respuesta_1_svc(char ** resp, struct svc_req *rqstp)
 {
-  int *u =  malloc(sizeof(int));
+  static int u = -1;
   int i = 0;
   int ip;
-  unsigned char *result = (unsigned char *) malloc(sizeof(unsigned char)*16);   
+  //unsigned char *result = (unsigned char *) malloc(sizeof(unsigned char)*16);   
   //sprintf(result,"%s",*resp);
-  memcpy(result, *resp, 16);
-  printf("El unsigned char se recibió como: \n");
-  MDPrint (result);
+  //memcpy(result, *resp, 16);
+
+  printf("El string se recibió como: \n");
+  printf("%s",*resp);
   printf("\n"); 
-  *resp = "bla";
+
+  //*resp = "bla";
   //MDPrint (retos[0]);
   // int ver = ;
   //printf("funcion %d ", ver);
-  printf("\n");
+  //printf("\n");
   
   //printf("respuesta %s \n", *resp);
+
   //buscamos el ip del cliente
   while (i < MAX_SERVERS){
     if (ips[i]==rqstp->rq_xprt->xp_raddr.sin_addr.s_addr ){
-      MDPrint (retos[i]);
-      printf("\n Y en string son: \n");
+      //MDPrint (retos[i]);
+      printf("Y el string que tenia: \n");
       printf("%s\n",retos[i]);
-      printf("%s\n",result);
+      //printf("%s\n",result);
       if( strcmp (retos[i], *resp) == 0){
       //if ((compararUnsignedChar(result,retos[i]))==0){
 	printf("COINCIDEN LAS CLAVES");
 	cuotas[i]= tiempo_actual + 5 ;
-	*u =0;
+	u =0;
 	break;
       } else {
 	printf("no coinciden claves");
-	*u = -1;
+	u = -1;
 	break;
       }
     }
     i =i +1;
   }
   // VEr si de verdad esta enviendo -1
-  return (u);
+  return &(u);
 }

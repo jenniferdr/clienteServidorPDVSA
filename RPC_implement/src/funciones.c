@@ -29,7 +29,6 @@ void opciones_servidor(){
   printf("-s <Cantidad De Suministro > \n");
   printf("-t <Tiempo> \n");
   printf("-cp <Numero Capacidad Maxima> \n");
-  //printf(" -p  <Puerto>");
 }
 
 
@@ -174,7 +173,7 @@ void obtener_argumentos_servidor (int num,char ** arreglo, char* nombr, int *inv
 /* Lee del archivo DNS la informacion correspondiente*/
 /* en los arreglos repectivos*/
 int obtener_lista_dns(char *filename,char ** nombre, 
-		      char **direcciones/*,int *puertos*/ ){
+		      char **direcciones){
    
   FILE *file = fopen ( filename, "r" ); 
   char *t;
@@ -225,10 +224,6 @@ int obtener_lista_dns(char *filename,char ** nombre,
 	  strcpy(direcciones[i],t);
 	  
 	}
-	/*if (j==2){
-	  
-	  puertos[i]=atoi(t); 
-	  }*/
 	j=j+1;
 	t = strtok (NULL, "&\n");
       }
@@ -237,7 +232,6 @@ int obtener_lista_dns(char *filename,char ** nombre,
     }
     
     free(t);
-    //puertos[i]=0;
     direcciones[i]= NULL;
     nombre[i]=NULL;
     fclose ( file );
@@ -282,16 +276,12 @@ documentation and/or software.
 void MDString (char *string,unsigned char *digest)
 {
   MD5_CTX context;
-  //unsigned char digest[16];
   unsigned int len = strlen (string);
 
   MDInit (&context);
   MDUpdate (&context, string, len);
   MDFinal (digest, &context);
 
-  //  printf ("MD5 (\"%s\") = ", string);
-  //MDPrint (digest);
-  //printf ("\n");
 }
 
 /* Prints a message digest in hexadecimal.
@@ -302,21 +292,4 @@ void MDPrint (unsigned char digest[16])
 
   for (i = 0; i < 16; i++)
     printf ("%02x", digest[i]);
-}
-
-
-int compararUnsignedChar ( unsigned char uno[16], unsigned char dos[16]){
-  int u = -1;
-  unsigned int i;
-
-  for (i = 0; i < 16; i++){
-    if (uno[i]==dos[i]){
-      u = 0;
-      i = i + 1;
-    } else {
-      break;
-    }
-  }
-  
-  return u;
 }
