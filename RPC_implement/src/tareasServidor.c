@@ -2,13 +2,6 @@
 #include "tareasServidor.h"
 #include <rpc/rpc.h>
 
-// Structura para guardar los tickets
-struct ticket {
-  int ip;
-  int cuota;
-  char* reto;
-};
-
 // Estructuras para info de los tickets
 int ips[MAX_SERVERS];
 int cuotas [MAX_SERVERS];
@@ -77,8 +70,6 @@ void tareas_servidor(int argc, char **argv){
   // Inicializar arreglos de ticket
   int ka = 0;
   while (ka<MAX_SERVERS){
-    // tickets[k].cuota = -1;  
-    //tickets[k].ip= -1;
     cuotas[ka]=-1;
     ips[ka]=-1;
     retos[ka]== NULL;
