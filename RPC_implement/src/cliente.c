@@ -86,6 +86,7 @@ int main(int argc, char *argv[]){
     int *result = pedir_tiempo_1(NULL,clnts[k]);
     if ( result == (int *)NULL){
       clnt_perror( clnts[k], "Error al conectar con servidor");
+      tiempos[k] = 500;
     }else{
       tiempos[k]= *result;
     }
@@ -146,6 +147,8 @@ int main(int argc, char *argv[]){
       char **result2 = pedir_gasolina_1( &nombre_pointer, clnts[r] );
       if ( result2 == (char **)NULL){
 	clnt_perror( clnts[r], "Error al conectar con servidor");
+	r= r+1;
+	continue;
       }else{
 	strcpy(gasolina,*result2);
       }
@@ -164,37 +167,35 @@ int main(int argc, char *argv[]){
       } else if ( strcmp(gasolina,"noTicket") == 0 ){
 
 	 int *retoInt = pedir_reto_1(NULL,clnts[r]);
-	 printf("El numero que recibí: %d \n",*retoInt);
+	 //printf("El numero que recibí: %d \n",*retoInt);
 
 	 // convertir el reto de int a string
-	 char *retoStr = (char *) malloc(sizeof(char)*10);
-	 sprintf(retoStr,"%d",*retoInt);
+	 char retoStr[10];
+	 sprintf(&retoStr[0],"%d",*retoInt);
 
 	 // Aplicar el algoritmo MD5
-	 unsigned char *respUChar= (unsigned char *) malloc(sizeof(unsigned char)*16);
-	 MDString (retoStr,respUChar);
-	 printf("El unsigned char se envió como: \n");
-	 MDPrint (respUChar);
-	 printf("\n");
+	 unsigned char respUChar[16];
+	 MDString (&retoStr[0],&respUChar[0]);
+	 //printf("El unsigned char se envió como: \n");
+	 //MDPrint (respUChar);
+	 //printf("\n");
 	
-
-	 char *md5string= (char *) malloc(sizeof(char)*33);
+	 // Convertir la respuesta a String
+	 char respString[33];
 	 int i;
 	 for(i = 0; i < 16; ++i)
-	   sprintf(&md5string[i*2], "%02x", (unsigned int)respUChar[i]);
+	   sprintf(&respString[i*2], "%02x", (unsigned int)respUChar[i]);
 
-	 printf("Y si lo imprimo como string es : \n");
-	 printf("%s \n",md5string);
+	 //printf("Y si lo imprimo como string es : \n");
+	 //printf("%s \n",&respString[0]);
 
-	 char *respStr;
-	 respStr = (char *) respUChar;
+	 // Para que RPC nos permita pasarlo como argumento
+	 char *respStr= (char*) &respString[0];
 	 
-	 int *resp = enviar_respuesta_1(&md5string, clnts[r]);
-	 //free(md5string);
+	 int *resp = enviar_respuesta_1(&respStr, clnts[r]);
 
 	 // FALTA VER SI LLEGA BIEN
 	 //printf("respuesta en enviar %d",*resp);
-	 
 	 // Y si es NULL ?
 	 
 	 if ( *resp == -1){

@@ -92,19 +92,18 @@ int *pedir_reto_1_svc(void *argp, struct svc_req *rqstp)
   srand((unsigned int ) reloj);
   numeroRn = (int) reloj;
 
-  printf("numero real %d \n",numeroRn);
+  //printf("numero real %d \n",numeroRn);
 
   // convertir el numero a string
-  char *numero = (char *) malloc(sizeof(char)*10);
-  sprintf(numero,"%d",numeroRn);
+  char numeroStr[10];
+  sprintf(&numeroStr[0],"%d",numeroRn);
   
-  // Aplicar el hash al reto
-  //unsigned char *resultado= (unsigned char *) malloc(sizeof(unsigned char)*16); 
+  // Aplicar el hash al reto 
   unsigned char resultado[16];
-  MDString (numero,&resultado[0]);
+  MDString (&numeroStr[0],&resultado[0]);
 
-  printf("Cuando genero el reto el mdprint es : \n");
-  MDPrint (&resultado[0]);
+  //printf("Cuando genero el reto el mdprint es : \n");
+  //MDPrint (&resultado[0]);
 
   // convirtiendo a string
   char *md5string= (char *) malloc(sizeof(char)*33);
@@ -112,8 +111,8 @@ int *pedir_reto_1_svc(void *argp, struct svc_req *rqstp)
   for(i = 0; i < 16; ++i)
     sprintf(&md5string[i*2], "%02x", (unsigned int)resultado[i]);
 
-  printf("Y si lo imprimo como string es : \n");
-  printf("%s \n",md5string);
+  //printf("Y si lo imprimo como string es : \n");
+  //printf("%s \n",md5string);
 
   // Buscar el ticket del cliente por su ip (en el arreglo de tickets) 
   int k = 0;
@@ -135,32 +134,21 @@ int *enviar_respuesta_1_svc(char ** resp, struct svc_req *rqstp)
   static int u = -1;
   int i = 0;
   int ip;
-  //unsigned char *result = (unsigned char *) malloc(sizeof(unsigned char)*16);   
-  //sprintf(result,"%s",*resp);
-  //memcpy(result, *resp, 16);
+ 
+  //printf("El string se recibió como: \n");
+  //printf("%s",*resp);
+  //printf("\n"); 
 
-  printf("El string se recibió como: \n");
-  printf("%s",*resp);
-  printf("\n"); 
-
-  //*resp = "bla";
-  //MDPrint (retos[0]);
-  // int ver = ;
-  //printf("funcion %d ", ver);
-  //printf("\n");
-  
-  //printf("respuesta %s \n", *resp);
-
-  //buscamos el ip del cliente
+  // Buscamos el ip del cliente
   while (i < MAX_SERVERS){
     if (ips[i]==rqstp->rq_xprt->xp_raddr.sin_addr.s_addr ){
-      //MDPrint (retos[i]);
-      printf("Y el string que tenia: \n");
-      printf("%s\n",retos[i]);
-      //printf("%s\n",result);
+      
+      //printf("Y el string que tenia: \n");
+      //printf("%s\n",retos[i]);
+      
       if( strcmp (retos[i], *resp) == 0){
-      //if ((compararUnsignedChar(result,retos[i]))==0){
-	printf("COINCIDEN LAS CLAVES");
+	// Ponerlo en el LOG del servidor (creo)
+	printf("COINCIDEN LAS CLAVES"); 
 	cuotas[i]= tiempo_actual + 5 ;
 	u =0;
 	break;
