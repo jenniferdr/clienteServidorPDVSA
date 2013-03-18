@@ -14,7 +14,6 @@ int suministro;    // Suministro promedio (Litros*Minutos)
 FILE *LOG;         // Archivo para la bitacora del servidor  
 pthread_mutex_t mutex; // mutex sobre el inventario
 int tiempo_respuesta; 
-struct ticket tickets [MAX_SERVERS];
 
 
 /* Hilo encargado de actualizar tiempo e inventario
