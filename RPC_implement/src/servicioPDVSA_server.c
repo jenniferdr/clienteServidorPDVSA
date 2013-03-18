@@ -106,7 +106,16 @@ int *pedir_reto_1_svc(void *argp, struct svc_req *rqstp)
   // Esto encripta una cadena de caracteres 
   MDString (numero,resultado);
   printf("Cuando genero el reto el mdprint es : \n");
+
+
+
   MDPrint (resultado);
+  //convirtiendo a string
+  char *md5string= (char *) malloc(sizeof(char)*33);
+  int i;
+  for(i = 0; i < 16; ++i)
+    sprintf(&md5string[i*2], "%02x", (unsigned int)resultado[i]);
+
   printf("Y si lo imprimo como string es : \n");
   printf("%s \n",resultado);
 
@@ -114,7 +123,7 @@ int *pedir_reto_1_svc(void *argp, struct svc_req *rqstp)
   int k = 0;
   while (k < MAX_SERVERS){
     if (ips[k]==rqstp->rq_xprt->xp_raddr.sin_addr.s_addr ){
-      retos[k]= resultado;
+      retos[k]= md5string;
       //  MDPrint (retos[k]);
       //strcpy (retos[k],resultado); // encriptado
       break;
@@ -130,7 +139,7 @@ int *enviar_respuesta_1_svc(char ** resp, struct svc_req *rqstp)
   int *u =  malloc(sizeof(int));
   int i = 0;
   int ip;
-  unsigned char *result= (unsigned char *) malloc(sizeof(unsigned char)*16);   
+  unsigned char *result = (unsigned char *) malloc(sizeof(unsigned char)*16);   
   //sprintf(result,"%s",*resp);
   memcpy(result, *resp, 16);
   printf("El unsigned char se recibió como: \n");
@@ -150,7 +159,7 @@ int *enviar_respuesta_1_svc(char ** resp, struct svc_req *rqstp)
       printf("\n Y en string son: \n");
       printf("%s\n",retos[i]);
       printf("%s\n",result);
-      if( strcmp (retos[i], result) == 0){
+      if( strcmp (retos[i], *resp) == 0){
       //if ((compararUnsignedChar(result,retos[i]))==0){
 	printf("COINCIDEN LAS CLAVES");
 	cuotas[i]= tiempo_actual + 5 ;
