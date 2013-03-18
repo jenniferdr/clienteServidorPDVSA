@@ -183,8 +183,11 @@ int main(int argc, char *argv[]){
 	 respStr = (char *) respUChar;
 	 
 	 int *resp = enviar_respuesta_1(&respStr, clnts[r]);
- 
+	 // FALTA VER SI LLEGA BIEN
+	 printf("respuesta en enviar %d",*resp);
+	 
 	 // Y si es NULL ?
+	 
 	 if ( *resp == -1){
 	   printf("error al autentificarse");
 

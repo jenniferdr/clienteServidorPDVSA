@@ -135,9 +135,12 @@ int *enviar_respuesta_1_svc(char ** resp, struct svc_req *rqstp)
   printf("El unsigned char se recibió como: \n");
   MDPrint (result);
   printf("\n"); 
+  *resp = "bla";
   //MDPrint (retos[0]);
-  
+  // int ver = ;
+  //printf("funcion %d ", ver);
   printf("\n");
+  
   //printf("respuesta %s \n", *resp);
   //buscamos el ip del cliente
   while (i < MAX_SERVERS){
@@ -146,7 +149,8 @@ int *enviar_respuesta_1_svc(char ** resp, struct svc_req *rqstp)
       printf("\n Y en string son: \n");
       printf("%s\n",retos[i]);
       printf("%s\n",result);
-      if( strcmp (retos[i], result) == 0){
+      //if( strcmp (retos[i], result) == 0){
+      if ((compararUnsignedChar(result, retos[i]))==0){
 	printf("COINCIDEN LAS CLAVES");
 	cuotas[i]= tiempo_actual + 5 ;
 	*u =0;

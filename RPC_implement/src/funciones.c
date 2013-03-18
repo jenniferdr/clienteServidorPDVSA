@@ -303,3 +303,24 @@ void MDPrint (unsigned char digest[16])
   for (i = 0; i < 16; i++)
     printf ("%02x", digest[i]);
 }
+
+
+int compararUnsignedChar ( unsigned char uno[16], unsigned char dos[16]){
+  int *u =  malloc(sizeof(int));
+  *u = -1;
+  unsigned int i;
+
+  for (i = 0; i < 16; i++){
+    if (uno[i]==dos[i]){
+      
+      *u = 0;
+      i = i + 1;
+    } else {
+  
+      break;
+    }
+  }
+  return *(u);
+
+
+}
