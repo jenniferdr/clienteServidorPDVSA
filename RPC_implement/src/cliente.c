@@ -47,18 +47,20 @@ void *llevar_tiempo(void *arg_tiempo){
 int main(int argc, char *argv[]){
   
   char nombre[MAX_LONG];  // Nombre de esta Bomba
-  char *nombre_pointer= &nombre[0]; 
+  char *nombre_pointer= &nombre[0]; // para poder enviarlo por RPC 
   int capMax;             // Capacidad Máxima (Litros)
   char archivo[MAX_LONG]; // Nombre de archivo "DNS"
 
   // Datos de los servidores
   char* nombres[MAX_SERVERS];
   char* direcciones[MAX_SERVERS];
-  CLIENT *clnts[MAX_SERVERS];
-  //int puertos[MAX_SERVERS];
   int tiempos[MAX_SERVERS];
+  CLIENT *clnts[MAX_SERVERS];
+
+  // Validar y obtener argumentos del cliente
   argumentos_cliente(argc,argv,nombre,&inventario,&consumo,&capMax,archivo);
-  obtener_lista_dns(archivo, nombres,direcciones/*,&puertos[0]*/);
+
+  obtener_lista_dns(archivo, nombres,direcciones);
  
   // creacion del archivo LOG del cliente
   char nombre_LOG[MAX_LONG];
@@ -179,12 +181,18 @@ int main(int argc, char *argv[]){
 	 printf("Y si lo imprimo como string es : \n");
 	 printf("%s \n",respUChar);
 	 
+
+	 char *md5string= (char *) malloc(sizeof(char)*33);
+	 int i;
+	 for(i = 0; i < 16; ++i)
+	   sprintf(&md5string[i*2], "%02x", (unsigned int)respUChar[i]);
+
 	 char *respStr;
 	 respStr = (char *) respUChar;
 	 
-	 int *resp = enviar_respuesta_1(&respStr, clnts[r]);
+	 int *resp = enviar_respuesta_1(&md5string, clnts[r]);
 	 // FALTA VER SI LLEGA BIEN
-	 printf("respuesta en enviar %d",*resp);
+	 //printf("respuesta en enviar %d",*resp);
 	 
 	 // Y si es NULL ?
 	 

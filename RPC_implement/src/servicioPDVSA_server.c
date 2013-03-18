@@ -3,6 +3,7 @@
 #include <time.h>
 #include <string.h>
 #include <stdio.h>
+
 /* Variables globales que se encuentran definidas
  * e inicializadas en "tareasServidor.h"
  */
@@ -149,8 +150,8 @@ int *enviar_respuesta_1_svc(char ** resp, struct svc_req *rqstp)
       printf("\n Y en string son: \n");
       printf("%s\n",retos[i]);
       printf("%s\n",result);
-      //if( strcmp (retos[i], result) == 0){
-      if ((compararUnsignedChar(result, retos[i]))==0){
+      if( strcmp (retos[i], result) == 0){
+      //if ((compararUnsignedChar(result,retos[i]))==0){
 	printf("COINCIDEN LAS CLAVES");
 	cuotas[i]= tiempo_actual + 5 ;
 	*u =0;
