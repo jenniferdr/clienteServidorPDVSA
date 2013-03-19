@@ -3,7 +3,7 @@
  */
 
 #include "funciones.h"
- 
+
 
 /*
  * Muestra por pantalla la sintaxis correcta para 
@@ -257,6 +257,15 @@ void swap(int *a , int *b){
   aux = *a;
   *a = *b;
   *b = aux;
+}
+
+void swapPointer(CLIENT **pointa,CLIENT **pointb){
+
+  CLIENT *aux;
+  aux = *pointa;
+  *pointa = *pointb;
+  *pointb = aux;
+
 }
 
 /* Copyright (C) 1990-2, RSA Data Security, Inc. Created 1990. All

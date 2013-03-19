@@ -19,7 +19,7 @@
 #define MAX_LONG 128
 #define MAX_SERVERS 50
 #define MAX_CONCURR 128
-
+#include <rpc/rpc.h> 
 
 // Para MD5
 
@@ -34,8 +34,14 @@
 #define MDFinal MD5Final
 
 
-
+/* Funcion que aplica el hash MD5 a la cadena de caracteres 'string'
+ * Devuelve el resultado en la variable result 
+ */
 void MDString (char * string ,unsigned char * result);
+
+/*
+ * Imprime por salida estandar la representacion en char de la variable digest
+ */
 void MDPrint (unsigned char digest[16]);
 
 /*
@@ -75,6 +81,9 @@ int obtener_lista_dns(char *filename,char ** nombre,
 
 /* Funcion Auxiliar que intercambia dos string*/
 void swapLetras(char** a , char** b);
+
+/* Funcion Auxiliar que intercambia dos string*/
+void swapPointer(CLIENT **a , CLIENT **b);
 
 /* funcion auxiliar que intercambia dos enteros*/
 void swap(int *a , int *b);
