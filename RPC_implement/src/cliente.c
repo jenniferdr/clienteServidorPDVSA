@@ -113,6 +113,7 @@ int main(int argc, char *argv[]){
     swap(&tiempos[i],&tiempos[minimo]);
     swapLetras(&nombres[i],&nombres[minimo]);
     swapLetras(&direcciones[i],&direcciones[minimo]);
+    swap(clnts[i],clnts[minimo]);
     i=i+1;
   }
  
