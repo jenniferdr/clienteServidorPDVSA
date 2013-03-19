@@ -148,7 +148,7 @@ int main(int argc, char *argv[]){
       char **result2 = pedir_gasolina_1( &nombre_pointer, clnts[r] );
       if ( result2 == (char **)NULL){
 	clnt_perror( clnts[r], "Error al conectar con servidor");
-	r= r+1;
+	r = r+1;
 	continue;
       }else{
 	strcpy(gasolina,*result2);
@@ -192,23 +192,22 @@ int main(int argc, char *argv[]){
 
 	 // Para que RPC nos permita pasarlo como argumento
 	 char *respStr= (char*) &respString[0];
-	 
 	 int *resp = enviar_respuesta_1(&respStr, clnts[r]);
 
 	 // FALTA VER SI LLEGA BIEN
-	 //printf("respuesta en enviar %d",*resp);
+	 printf("respuesta en enviar %d\n",*resp);
 	 // Y si es NULL ?
 	 
 	 if ( *resp == -1){
 	   printf("error al autentificarse");
-
+	   fprintf(LOG,"Autenticacion Fallida \n");
 	   // PONER EN EL LOG AUTENTICACION FALLIDA
 	   r = r + 1;
 	   continue;
 	 }else{
+	   fprintf(LOG,"Autenticacion Correcta\n");
 	   continue;
-	   // para pedir gasolina de nuevo
-	   // PONER EN EL LOG AUTENTICACION CORRECTA
+	   
 	 } 
 	 
       } else {

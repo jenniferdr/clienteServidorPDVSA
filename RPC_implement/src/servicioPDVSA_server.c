@@ -12,7 +12,6 @@ extern int tiempo_respuesta;
 extern int inventario;
 extern pthread_mutex_t mutex;
 extern FILE *LOG;
-//extern struct ticket *tickets[MAX_SERVERS];
 int numeroRn;
 
 
@@ -22,57 +21,69 @@ extern unsigned char *retos[MAX_SERVERS];
 
 char **pedir_gasolina_1_svc(char ** bomba, struct svc_req *rqstp)
 { 
-  int i =0 ;
+  static char *result;
+  result= (char *) malloc(sizeof(char)*20);
+   while(result == 0){
+    printf("Memoria no reservada, esperare un segundo");
+    sleep(1);
+    result = (char *) malloc (sizeof(char) * 128);
+   
+  }
+    
+  int i = 0 ;
+  /* Ubicar el cliente que realiza la peticion */
   while (i < MAX_SERVERS && ips[i]!= -1){
     if (ips[i]==rqstp->rq_xprt->xp_raddr.sin_addr.s_addr){
       break;
     }
     i=i+1;
   }
+  /* Si el cliente no es reconocido responde que no lo puede
+     atender */
+  if (i == MAX_SERVERS){
+    printf("cliente no reconocido");
+    strcpy(result,"noDisponible");
    
-  // VERIFICAR SI EL CLIENTE SE ENCONTRO DE VERDAD O NO ESTABA EN EL ARREGLO
+    return &(result);
+  } else {
 
-
-
-  // 1. Buscar el ticket del cliente por su ip
-  //    Si no existe retornarle al cliente el string "noTicket"
-  //    si existe verificar si el tiempo es valido 
-  //       Si el ticket no es valido ¿reportar en el LOG? y retornar "noTicket"
-  //       Si es valido seguir ...
-  static char *result;
-  result= (char *) malloc(sizeof(char)*20);
-  
-  if (cuotas[i] < tiempo_actual){
-    result = "noTicket";
-    printf(" NO TENGO TICKETS \n"); 
-  }
-  else {
-    printf("TENGO TICKETS \n");
-    // Verificar si hay disponibilidad
-    pthread_mutex_lock(&mutex);
-    if( inventario >= 38000 ){
-      inventario= inventario - 38000;
-      if(inventario==0)fprintf(LOG,"Tanque vacío: %d minutos \n",tiempo_actual);
+    if (cuotas[i] < tiempo_actual){
+      strcpy(result,"noTicket");
+      printf(" NO TENGO TICKETS \n"); 
+    }
+    else {
+     
+      printf("TENGO TICKETS \n");
+      // Verificar si hay disponibilidad
+      pthread_mutex_lock(&mutex);
+      if( inventario >= 38000 ){
+	inventario= inventario - 38000;
+	if(inventario==0)fprintf(LOG,"Tanque vacío: %d minutos \n",tiempo_actual);
       strcpy(result,"enviando");
       fprintf(LOG,"Suministro: %d minutos, %s, OK, %d litros \n"
 	      ,tiempo_actual,*bomba,inventario);
-    }else{
-      printf("Centro con inventario insuficiente \n");
-      fprintf(LOG,"Suministro: %d minutos, %s, No disponible, %d litros \n"
-	      ,tiempo_actual,*bomba,inventario);
-      strcpy(result,"noDisponible");
+      }else{
+	printf("Centro con inventario insuficiente \n");
+	fprintf(LOG,"Suministro: %d minutos, %s, No disponible, %d litros \n"
+		,tiempo_actual,*bomba,inventario);
+	strcpy(result,"noDisponible");
+      }
+      pthread_mutex_unlock(&mutex);
     }
-    pthread_mutex_unlock(&mutex);
+    
+    return &(result);
   }
-
-  return &(result);
 }
-
+/* Funcion para pedir el tiempo del servidor*/
 int *pedir_tiempo_1_svc(void *argp, struct svc_req *rqstp)
 {
-  printf("client address: %u", rqstp->rq_xprt->xp_raddr.sin_addr.s_addr);
+ 
+  static char *result;
+  result= (char *) malloc(sizeof(char)*20);
   
   int k = 0;
+  /* Busca la primera posicion libre del arreglo 
+     para colocar el siguiente cliente */
   while (k < MAX_SERVERS){
     // Y si ya esta lleno el arreglo de tickets ?
     if (ips[k]==-1){
@@ -81,10 +92,15 @@ int *pedir_tiempo_1_svc(void *argp, struct svc_req *rqstp)
     }
     k=k+1;
   }
-  //  printf("ip guardado %d \n", ips[k]);
+  /*if (k == MAX_SERVERS){
+    strcpy(result,"noDisponible"); 
+    
+    return &(result);
+    }*/
+  //printf("ip guardado %d \n", ips[k]);
   return &tiempo_respuesta;
 }
-
+/* Funcion que retorna el reto que debe encriptar el cliente*/
 int *pedir_reto_1_svc(void *argp, struct svc_req *rqstp)
 {
   time_t reloj;
@@ -111,16 +127,10 @@ int *pedir_reto_1_svc(void *argp, struct svc_req *rqstp)
   for(i = 0; i < 16; ++i)
     sprintf(&md5string[i*2], "%02x", (unsigned int)resultado[i]);
 
-  //printf("Y si lo imprimo como string es : \n");
-  //printf("%s \n",md5string);
-
-  // Buscar el ticket del cliente por su ip (en el arreglo de tickets) 
   int k = 0;
   while (k < MAX_SERVERS){
     if (ips[k]==rqstp->rq_xprt->xp_raddr.sin_addr.s_addr ){
       retos[k]= md5string;
-      //  MDPrint (retos[k]);
-      //strcpy (retos[k],resultado); // encriptado
       break;
     }
     k=k+1;
@@ -128,38 +138,32 @@ int *pedir_reto_1_svc(void *argp, struct svc_req *rqstp)
        
   return &numeroRn;
 }
-
+/* Funcion que compara la clave encriptada del servidor con la 
+   del cliente y otorga o rechaza un ticket*/
 int *enviar_respuesta_1_svc(char ** resp, struct svc_req *rqstp)
 {
   static int u = -1;
   int i = 0;
   int ip;
  
-  //printf("El string se recibió como: \n");
-  //printf("%s",*resp);
-  //printf("\n"); 
-
-  // Buscamos el ip del cliente
+  /* Buscamos el ip del cliente */
   while (i < MAX_SERVERS){
     if (ips[i]==rqstp->rq_xprt->xp_raddr.sin_addr.s_addr ){
       
-      //printf("Y el string que tenia: \n");
-      //printf("%s\n",retos[i]);
-      
+      /* Comparar que la clave del cliente y servidor coinciden*/
       if( strcmp (retos[i], *resp) == 0){
-	// Ponerlo en el LOG del servidor (creo)
-	printf("COINCIDEN LAS CLAVES"); 
+	/* otorgamos el ticket */
 	cuotas[i]= tiempo_actual + 5 ;
-	u =0;
+	fprintf(LOG,"Autenticado al tiempo : %d \n", tiempo_actual)
+	u = 0;
 	break;
       } else {
-	printf("no coinciden claves");
 	u = -1;
+	fprintf(LOG,"Autenticacion fallida al tiempo : %d \n", tiempo_actual);
 	break;
       }
     }
-    i =i +1;
+    i = i +1;
   }
-  // VEr si de verdad esta enviendo -1
   return &(u);
 }
