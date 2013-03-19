@@ -154,7 +154,7 @@ int *enviar_respuesta_1_svc(char ** resp, struct svc_req *rqstp)
       if( strcmp (retos[i], *resp) == 0){
 	/* otorgamos el ticket */
 	cuotas[i]= tiempo_actual + 5 ;
-	fprintf(LOG,"Autenticado al tiempo : %d \n", tiempo_actual)
+	fprintf(LOG,"Autenticado al tiempo : %d \n", tiempo_actual);
 	u = 0;
 	break;
       } else {
