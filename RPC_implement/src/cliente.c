@@ -5,8 +5,8 @@
  * hace una peticion al servidor para llenarlo.
  *
  * Version 2.0 (Implementacion RPC)
- * Autores: Juliana Leon 
- *          Jennifer Dos Reis
+ * Autores: Juliana Leon 08-10608
+ *          Jennifer Dos Reis 08-10323
  */
 
 #include "servicioPDVSA.h"
@@ -120,16 +120,16 @@ int main(int argc, char *argv[]){
 
   // Iniciar contador de tiempo 
   pthread_t contador_tiempo;
-  int tiempo=0;
+  int tiempo = 0;
   pthread_create(&contador_tiempo,NULL,llevar_tiempo,&tiempo);
  
   /**** INICIO DE LA SIMULACION ****/   
   int r = 0;
 
   while (tiempo <= 480){
-    //Iterar sobre los servidores "direcciones[r]" pidiendo gasolina
+    //Iterar sobre los servidores pidiendo gasolina
     
-    if(direcciones[r]==NULL){
+    if(direcciones[r] == NULL){
       // Si llegamos al final de la lista, reiniciar.
       r = 0;
       usleep(100000);
@@ -137,7 +137,7 @@ int main(int argc, char *argv[]){
 
     if ((capMax-inventario)>=38000){
 
-      // Verificar si el servidor r no respondió al pedir tiempos
+      // Verificar si el servidor no respondió al pedir tiempos
       if (tiempos[r] == 500){ 
 	r = r +1;
 	continue;
@@ -168,7 +168,7 @@ int main(int argc, char *argv[]){
       } else if ( strcmp(gasolina,"noTicket") == 0 ){
 
 	 int *retoInt = pedir_reto_1(NULL,clnts[r]);
-	 //printf("El numero que recibí: %d \n",*retoInt);
+ 
 
 	 // convertir el reto de int a string
 	 char retoStr[10];
@@ -177,9 +177,6 @@ int main(int argc, char *argv[]){
 	 // Aplicar el algoritmo MD5
 	 unsigned char respUChar[16];
 	 MDString (&retoStr[0],&respUChar[0]);
-	 //printf("El unsigned char se envió como: \n");
-	 //MDPrint (respUChar);
-	 //printf("\n");
 	
 	 // Convertir la respuesta a String
 	 char respString[33];
@@ -187,21 +184,12 @@ int main(int argc, char *argv[]){
 	 for(i = 0; i < 16; ++i)
 	   sprintf(&respString[i*2], "%02x", (unsigned int)respUChar[i]);
 
-	 //printf("Y si lo imprimo como string es : \n");
-	 //printf("%s \n",&respString[0]);
-
 	 // Para que RPC nos permita pasarlo como argumento
 	 char *respStr= (char*) &respString[0];
 	 int *resp = enviar_respuesta_1(&respStr, clnts[r]);
-
-	 // FALTA VER SI LLEGA BIEN
-	 printf("respuesta en enviar %d\n",*resp);
-	 // Y si es NULL ?
 	 
 	 if ( *resp == -1){
-	   printf("error al autentificarse");
 	   fprintf(LOG,"Autenticacion Fallida \n");
-	   // PONER EN EL LOG AUTENTICACION FALLIDA
 	   r = r + 1;
 	   continue;
 	 }else{
@@ -211,7 +199,7 @@ int main(int argc, char *argv[]){
 	 } 
 	 
       } else {
-	// El ticket aun sigue vigente =) . Esperar y recibir gasolina.
+	// El ticket aun sigue vigente . Esperar y recibir gasolina.
 
 	fprintf(LOG,"Peticion: %d minutos, %s, OK, %d litros  \n",
 		tiempo, nombres[r],inventario);

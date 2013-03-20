@@ -18,9 +18,11 @@ int numeroRn;
 extern int ips[MAX_SERVERS];
 extern int cuotas [MAX_SERVERS];
 extern unsigned char *retos[MAX_SERVERS];
+/* Funcion que procesa el pedido de gasolina y verifica si el tickets esta vigente*/
 
 char **pedir_gasolina_1_svc(char ** bomba, struct svc_req *rqstp)
 { 
+  
   static char *result;
   result= (char *) malloc(sizeof(char)*20);
    while(result == 0){
@@ -41,7 +43,7 @@ char **pedir_gasolina_1_svc(char ** bomba, struct svc_req *rqstp)
   /* Si el cliente no es reconocido responde que no lo puede
      atender */
   if (i == MAX_SERVERS){
-    printf("cliente no reconocido");
+   
     strcpy(result,"noDisponible");
    
     return &(result);
@@ -49,11 +51,9 @@ char **pedir_gasolina_1_svc(char ** bomba, struct svc_req *rqstp)
 
     if (cuotas[i] < tiempo_actual){
       strcpy(result,"noTicket");
-      printf(" NO TENGO TICKETS \n"); 
     }
     else {
-     
-      printf("TENGO TICKETS \n");
+    
       // Verificar si hay disponibilidad
       pthread_mutex_lock(&mutex);
       if( inventario >= 38000 ){
@@ -63,7 +63,7 @@ char **pedir_gasolina_1_svc(char ** bomba, struct svc_req *rqstp)
       fprintf(LOG,"Suministro: %d minutos, %s, OK, %d litros \n"
 	      ,tiempo_actual,*bomba,inventario);
       }else{
-	printf("Centro con inventario insuficiente \n");
+	//printf("Centro con inventario insuficiente \n");
 	fprintf(LOG,"Suministro: %d minutos, %s, No disponible, %d litros \n"
 		,tiempo_actual,*bomba,inventario);
 	strcpy(result,"noDisponible");
@@ -78,26 +78,17 @@ char **pedir_gasolina_1_svc(char ** bomba, struct svc_req *rqstp)
 int *pedir_tiempo_1_svc(void *argp, struct svc_req *rqstp)
 {
  
-  static char *result;
-  result= (char *) malloc(sizeof(char)*20);
-  
   int k = 0;
   /* Busca la primera posicion libre del arreglo 
      para colocar el siguiente cliente */
   while (k < MAX_SERVERS){
-    // Y si ya esta lleno el arreglo de tickets ?
+ 
     if (ips[k]==-1){
        ips[k] = rqstp->rq_xprt->xp_raddr.sin_addr.s_addr; 
        break;
     }
     k=k+1;
   }
-  /*if (k == MAX_SERVERS){
-    strcpy(result,"noDisponible"); 
-    
-    return &(result);
-    }*/
-  //printf("ip guardado %d \n", ips[k]);
   return &tiempo_respuesta;
 }
 /* Funcion que retorna el reto que debe encriptar el cliente*/
@@ -108,8 +99,6 @@ int *pedir_reto_1_svc(void *argp, struct svc_req *rqstp)
   srand((unsigned int ) reloj);
   numeroRn = (int) reloj;
 
-  //printf("numero real %d \n",numeroRn);
-
   // convertir el numero a string
   char numeroStr[10];
   sprintf(&numeroStr[0],"%d",numeroRn);
@@ -117,9 +106,6 @@ int *pedir_reto_1_svc(void *argp, struct svc_req *rqstp)
   // Aplicar el hash al reto 
   unsigned char resultado[16];
   MDString (&numeroStr[0],&resultado[0]);
-
-  //printf("Cuando genero el reto el mdprint es : \n");
-  //MDPrint (&resultado[0]);
 
   // convirtiendo a string
   char *md5string= (char *) malloc(sizeof(char)*33);
